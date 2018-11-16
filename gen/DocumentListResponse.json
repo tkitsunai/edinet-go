@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "parameter": {
+          "type": "object",
+          "properties": {
+            "date": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "processDateTime": {
+          "type": "string"
+        },
+        "resultset": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer"
+            }
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "JCN": {
+            "type": "string"
+          },
+          "attachDocFlag": {
+            "type": "string"
+          },
+          "currentReportReason": {
+            "type": "string"
+          },
+          "disclosureStatus": {
+            "type": "string"
+          },
+          "docDescription": {
+            "type": "string"
+          },
+          "docID": {
+            "type": "string"
+          },
+          "docInfoEditStatus": {
+            "type": "string"
+          },
+          "docTypeCode": {
+            "type": "string"
+          },
+          "edinetCode": {
+            "type": "string"
+          },
+          "englishDocFlag": {
+            "type": "string"
+          },
+          "filerName": {
+            "type": "string"
+          },
+          "formCode": {
+            "type": "string"
+          },
+          "fundCode": {
+            "type": "string"
+          },
+          "issuerEdinetCode": {
+            "type": "string"
+          },
+          "opeDateTime": {
+            "type": "string"
+          },
+          "ordinanceCode": {
+            "type": "string"
+          },
+          "parentDocID": {
+            "type": "string"
+          },
+          "pdfFlag": {
+            "type": "string"
+          },
+          "periodEnd": {
+            "type": "string"
+          },
+          "periodStart": {
+            "type": "string"
+          },
+          "secCode": {
+            "type": "string"
+          },
+          "seqNumber": {
+            "type": "integer"
+          },
+          "subjectEdinetCode": {
+            "type": "string"
+          },
+          "submitDateTime": {
+            "type": "string"
+          },
+          "subsidiaryEdinetCode": {
+            "type": "string"
+          },
+          "withdrawalStatus": {
+            "type": "string"
+          },
+          "xbrlFlag": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
