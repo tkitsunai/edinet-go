@@ -10,10 +10,10 @@ import (
 type DocumentRequestType int
 
 const (
-	AuditReport     DocumentRequestType = 1
-	PDFRequestType  DocumentRequestType = 2
-	Attachment      DocumentRequestType = 3
-	EnglishDocument DocumentRequestType = 4
+	AuditReport     DocumentRequestType = iota +1
+	PDFRequestType
+	Attachment
+	EnglishDocument
 )
 
 type DocumentRequestParameter struct {

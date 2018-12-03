@@ -5,8 +5,8 @@ import "errors"
 type RequestType int
 
 const (
-	MetaDataOnly         RequestType = 1
-	MetaDataAndDocuments RequestType = 2
+	MetaDataOnly         RequestType = iota +1
+	MetaDataAndDocuments
 )
 
 type DocumentListRequestParameter struct {
