@@ -10,7 +10,7 @@ import (
 type DocumentRequestType int
 
 const (
-	AuditReport     DocumentRequestType = iota +1
+	AuditReport DocumentRequestType = iota + 1
 	PDFRequestType
 	Attachment
 	EnglishDocument

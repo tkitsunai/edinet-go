@@ -5,7 +5,7 @@ import "errors"
 type RequestType int
 
 const (
-	MetaDataOnly         RequestType = iota +1
+	MetaDataOnly RequestType = iota + 1
 	MetaDataAndDocuments
 )
 
