@@ -29,3 +29,6 @@ PACKAGE_DIR="edinet/api/v1"
 schema-v1:
 	$(GOCMD) get github.com/idubinskiy/schematyper
 	schematyper --package=v1 -o $(PACKAGE_DIR)/gen_document_list.go gen/DocumentListResponse.json
+
+docker-all:
+	./docker-build.sh && ./docker-push.sh

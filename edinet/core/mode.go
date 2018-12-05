@@ -7,8 +7,8 @@ const (
 	Debug   Mode = "debug"
 )
 
-type Engine interface {
+type V1Engine interface {
 	RequestDocumentContent() error
 	RequestDocumentList() error
-	SetMode(Mode) (Engine, error)
+	SetMode(Mode) (V1Engine, error)
 }

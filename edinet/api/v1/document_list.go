@@ -24,4 +24,5 @@ func (f FileDate) Validate() error {
 }
 
 // must be generated struct "DocumentListResponse"
+// gen_document_list.go
 type DocumentContentResponses []*DocumentListResponse

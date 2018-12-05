@@ -10,7 +10,7 @@ func defaultClient() *client {
 	}
 }
 
-func NewDefault() core.Engine {
+func NewDefault() core.V1Engine {
 	return defaultClient()
 }
 
@@ -18,7 +18,7 @@ type client struct {
 	mode core.Mode
 }
 
-func (c *client) SetMode(mode core.Mode) (core.Engine, error) {
+func (c *client) SetMode(mode core.Mode) (core.V1Engine, error) {
 	c.mode = mode
 	return c, nil
 }
