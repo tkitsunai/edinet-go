@@ -6,5 +6,6 @@ github.com/gedex/inflector v0.0.0-20170307190818-16278e9db813 h1:Uc+IZ7gYqAf/rSG
 github.com/gedex/inflector v0.0.0-20170307190818-16278e9db813/go.mod h1:P+oSoE9yhSRvsmYyZsshflcR6ePWYLql6UU1amW13IM=
 github.com/idubinskiy/schematyper v0.0.0-20181109082725-a154ed9ac195 h1:Pjua4072pff4GLhIPDf/aKewhdmA60sXKZOVpwIV4S8=
 github.com/idubinskiy/schematyper v0.0.0-20181109082725-a154ed9ac195/go.mod h1:xVHEhsiSJJnT0jlcQpQUg+GyoLf0i0xciM1kqWTGT58=
+github.com/idubinskiy/schematyper v0.0.0-20190120235449-f71b40dac30d/go.mod h1:xVHEhsiSJJnT0jlcQpQUg+GyoLf0i0xciM1kqWTGT58=
 gopkg.in/alecthomas/kingpin.v2 v2.2.6 h1:jMFz6MfLP0/4fUyZle81rXUoxOBFi19VUFKVDOQfozc=
 gopkg.in/alecthomas/kingpin.v2 v2.2.6/go.mod h1:FMv+mEhP44yOT+4EoQTLFTRgOQ1FBLkstjWtayDeSgw=
