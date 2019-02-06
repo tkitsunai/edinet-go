@@ -16,7 +16,7 @@ In addition to the standard function for EDINET-API, It has own persistence mech
 
 ## Requirement
 
-go ~1.11.0
+Go: 1.11.5 (using on Dockerfile)
 
 ## Usage on docker
 

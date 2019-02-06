@@ -1,32 +1,49 @@
 package edinet
 
 import (
+	"github.com/tkitsunai/edinet-go/edinet/api/v1"
 	"github.com/tkitsunai/edinet-go/edinet/core"
+)
+
+type Mode string
+
+const (
+	Release Mode = "release"
+	Debug   Mode = "debug"
 )
 
 func defaultClient() *client {
 	return &client{
-		mode: core.Release,
+		mode: Release,
 	}
 }
 
-func NewDefault() core.V1Engine {
+func NewDefault() v1.Engine {
 	return defaultClient()
 }
 
 type client struct {
-	mode core.Mode
+	mode Mode
+
+	requestForDocumentList    core.Configuration
+	requestForDocumentContent core.Configuration
 }
 
-func (c *client) SetMode(mode core.Mode) (core.V1Engine, error) {
-	c.mode = mode
-	return c, nil
+func (c *client) RequestDocumentListByParameter(parameter v1.DocumentListRequestParameter) error {
+	err := parameter.FileDate.Validate()
+
+	if err != nil {
+		return err
+	}
+
+	//core.NewHttpClient().ExecuteGetJsonType(core.NewEdinetConfig().RequestBaseUri().String())
+	panic("implement me")
 }
 
-func (c *client) RequestDocumentList() error {
-	return nil
+func (c *client) RequestDocumentList(requestType v1.RequestType) error {
+	panic("implement me")
 }
 
-func (c *client) RequestDocumentContent() error {
-	return nil
+func (c *client) RequestDocumentContent(requestType v1.RequestType) error {
+	panic("implement me")
 }
