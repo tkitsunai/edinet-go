@@ -18,7 +18,7 @@ In addition to the standard function for EDINET-API, It has own persistence mech
 
 Go: 1.11.5 (using on Dockerfile)
 
-## Usage on docker
+## Usage on docker (API server only)
 
 see `docker-run.sh`
 
@@ -26,8 +26,8 @@ see `docker-run.sh`
 docker run \
     -d \
     -p 8080:8080 \
-    --name edinet-goapi \
-    tkitsunai/edinet-goapi:latest
+    --name edinet-go \
+    tkitsunai/edinet-go:latest
 ```
 
 ## Local Debugging
