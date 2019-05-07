@@ -1,4 +1,4 @@
-FROM golang:1.12.4 AS build-env
+FROM golang:1.12.5 AS build-env
 ENV APP_DIR ${GOPATH}/src/github.com/tkitsunai/edinet-go
 WORKDIR ${APP_DIR}
 COPY ./ ${APP_DIR}
