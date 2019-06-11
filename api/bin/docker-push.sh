@@ -1,5 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
-IMAGE_NAME=tkitsunai/edinet-go
+set -eu
+
+IMAGE_NAME=tkitsunai/edinet-api-server
 TAG=$(git rev-parse --short HEAD)
 docker push ${IMAGE_NAME}:${TAG}

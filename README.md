@@ -16,22 +16,7 @@ In addition to the standard function for EDINET-API, It has own persistence mech
 
 ## Requirement
 
-Go: 1.11.5 (using on Dockerfile)
-
-## Usage on docker (API server only)
-
-see `docker-run.sh`
-
-```
-docker run \
-    -d \
-    -p 8080:8080 \
-    --name edinet-go \
-    tkitsunai/edinet-go:latest
-```
-
-## Local Debugging
-Run ```make run``` to compile your code and start the server. Open ```http://localhost:8080/system/ping``` in your browser. The page should display ```pong```. Refresh the page to talk to your code.
+Go: 1.12.5 (using on Dockerfile)
 
 ## Recruitment of Contributors
 

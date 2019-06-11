@@ -1,4 +1,4 @@
-FROM golang:1.12.5 AS build-env
+FROM golang:1.12.5-stretch AS build-env
 ENV APP_DIR ${GOPATH}/src/github.com/tkitsunai/edinet-go
 WORKDIR ${APP_DIR}
 COPY ./ ${APP_DIR}
@@ -7,5 +7,5 @@ RUN make linux
 
 FROM alpine
 RUN apk --no-cache add tzdata
-COPY --from=build-env /app/edinet-go-linux /usr/local/bin/edinet-go
-ENTRYPOINT ["/usr/local/bin/edinet-go"]
+COPY --from=build-env /app/exedinet-server-linux /usr/local/bin/exedinet-server
+ENTRYPOINT ["/usr/local/bin/exedinet-server"]
