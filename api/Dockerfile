@@ -1,4 +1,4 @@
-FROM golang:1.12.5-stretch AS build-env
+FROM golang:1.12.6-stretch AS build-env
 ENV APP_DIR ${GOPATH}/src/github.com/tkitsunai/edinet-go
 WORKDIR ${APP_DIR}
 COPY ./ ${APP_DIR}
