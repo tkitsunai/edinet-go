@@ -16,7 +16,7 @@ In addition to the standard function for EDINET-API, It has own persistence mech
 
 ## Requirement
 
-Go: 1.12.5 (using on Dockerfile)
+Go: 1.13.1 (using on Dockerfile)
 
 ## Recruitment of Contributors
 
