@@ -60,6 +60,6 @@ func (c V1Client) RequestDocumentList(date v1.FileDate) (*v1.DocumentListRespons
 	return &res, nil
 }
 
-func (c V1Client) RequestDocumentContent(requestType v1.RequestType) error {
+func (c V1Client) RequestDocumentContent(requestType v1.RequestType) (*v1.DocumentListResponse, error) {
 	panic("implement me")
 }

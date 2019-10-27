@@ -15,6 +15,7 @@ func init() {
 
 	doc := NewDocumentsResource()
 	v1.Handle(doc.GetDocuments())
+	v1.Handle(doc.GetDocumentsByTerm())
 
 	router = g
 }
