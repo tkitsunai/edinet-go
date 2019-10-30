@@ -1,7 +1,7 @@
 NAME=exedinet-server
 GOCMD=GO111MODULE=on go
 
-.PHONY: all test linux darwin windows clean chmod
+.PHONY: all test linux darwin windows clean chmod mod clean server dockerbuild
 all: schema-v1 test linux darwin
 
 linux: build-linux
@@ -29,3 +29,6 @@ schema-v1:
 
 server:
 	PORT=8080 $(GOCMD) run main.go
+
+dockerbuild:
+	docker build -t tkitsunai/edinet-go/exedinet-api .

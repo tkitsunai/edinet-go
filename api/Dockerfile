@@ -2,7 +2,7 @@ FROM golang:1.13.3-stretch AS build-env
 ENV APP_DIR ${GOPATH}/src/github.com/tkitsunai/edinet-go
 WORKDIR ${APP_DIR}
 COPY ./ ${APP_DIR}
-RUN ln -s ${APP_DIR}/bin/ /app
+RUN ln -s ${APP_DIR}/dist/ /app
 RUN make linux
 
 FROM alpine
