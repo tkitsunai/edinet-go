@@ -27,5 +27,5 @@ schema-v1:
 	$(GOCMD) get github.com/idubinskiy/schematyper
 	schematyper --package=v1 -o $(PACKAGE_DIR)/gen_document_list.go gen/DocumentListResponse.json
 
-run:
+server:
 	PORT=8080 $(GOCMD) run main.go

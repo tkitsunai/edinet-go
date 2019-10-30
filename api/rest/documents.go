@@ -71,13 +71,23 @@ func (d Documents) GetDocumentsByTerm() (method, sPath string, fn func(ctx *gin.
 			ToDate:   to,
 		}
 
-		err = d.useCase.FindOverviewByTerm(term)
+		overviews, errs := d.useCase.FindOverviewByTerm(term)
 
-		if err != nil {
+		if errs != nil && len(errs) > 0 {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"errorMessage": err.Error()})
+			ctx.Abort()
 		}
 
-		ctx.JSON(http.StatusOK)
+		var res []v1.DocumentListResponse
+		for _, overview := range overviews {
+			if overview != nil {
+				res = append(res, *overview)
+			}
+		}
+
+		ctx.JSON(http.StatusOK, v1.DocumentListResponses{
+			List: res,
+		})
 	}
 }
 

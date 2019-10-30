@@ -18,12 +18,20 @@ const (
 	MetaDataAndDocuments
 )
 
+const (
+	EdinetDateFormat = "2006-01-02"
+)
+
 type DocumentListRequestParameter struct {
 	FileDate FileDate
 	Type     RequestType
 }
 
 type FileDate string
+
+func NewFileDate(value time.Time) FileDate {
+	return FileDate(value.Format(EdinetDateFormat))
+}
 
 func (f FileDate) String() string {
 	return string(f)
