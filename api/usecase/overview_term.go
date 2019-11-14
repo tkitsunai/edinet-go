@@ -5,6 +5,8 @@ import (
 	"github.com/tkitsunai/edinet-go/api/domain"
 	"github.com/tkitsunai/edinet-go/api/edinet"
 	v1 "github.com/tkitsunai/edinet-go/api/edinet/api/v1"
+	"sync"
+	"time"
 )
 
 type OverviewTerm struct {
@@ -27,16 +29,22 @@ func (t OverviewTerm) FindOverviewByTerm(term domain.Term) ([]*v1.DocumentListRe
 	var errorsPack []error
 	var results []*v1.DocumentListResponse
 
+	var mutex = &sync.Mutex{}
+	wg := sync.WaitGroup{}
 	for _, day := range days {
-		res, err := t.Client.RequestDocumentList(v1.NewFileDate(day))
-
-		if err != nil {
-			errorsPack = append(errorsPack, err)
-			continue
-		}
-
-		results = append(results, res)
+		wg.Add(1)
+		mutex.Lock()
+		go func(day time.Time) {
+			defer wg.Done()
+			res, err := t.Client.RequestDocumentList(v1.NewFileDate(day))
+			if err != nil {
+				errorsPack = append(errorsPack, err)
+			}
+			results = append(results, res)
+			mutex.Unlock()
+		}(day)
 	}
+	wg.Wait()
 
 	fmt.Println("Day Size: ", len(days))
 	fmt.Println("Response Success Size: ", len(results))
