@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/tkitsunai/edinet-go/core"
 	"github.com/tkitsunai/edinet-go/edinet"
+	"github.com/tkitsunai/edinet-go/logger"
 	"sync"
 	"time"
 )
@@ -51,9 +52,8 @@ func (t *OverviewTerm) FindOverviewByTerm(term core.Term) ([]*edinet.DocumentLis
 	}
 	wg.Wait()
 
-	fmt.Println("Day Size: ", len(days))
-	fmt.Println("Response Success Size: ", len(results))
-	fmt.Println("Response Error Size: ", len(errorsPack))
+	logger.Logger.Info().Msg(fmt.Sprintf("Day Size: %d", len(days)))
+	logger.Logger.Info().Msg(fmt.Sprintf("Response Success Size: %d", len(results)))
 
 	return results, errorsPack
 }

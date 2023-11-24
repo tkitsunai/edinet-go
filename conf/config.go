@@ -58,6 +58,7 @@ func readServerConfig() {
 	v.AddConfigPath(filepath.Join(filepath.Dir(homeDir), ".edinet-go"))
 	v.AddConfigPath(".")
 	v.AutomaticEnv()
+	v.AllowEmptyEnv(true)
 
 	err = v.ReadInConfig()
 	if err != nil {

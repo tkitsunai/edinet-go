@@ -3,9 +3,9 @@ package edinet
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"github.com/tkitsunai/edinet-go/logger"
 	"io"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -32,13 +32,12 @@ func (r *HttpClient) newRequest(
 	contentType string,
 	body io.Reader,
 ) (*http.Request, error) {
-	log.Println("Request to:", u.String())
-
+	logger.Logger.Debug().Msg(fmt.Sprintf("Request to:%s", u.String()))
 	var requestBody string
 	if body != nil {
 		reqBody, _ := io.ReadAll(body)
 		requestBody = string(reqBody)
-		log.Println("Request body:", requestBody)
+		logger.Logger.Debug().Msg(fmt.Sprintf("Request body:%s", requestBody))
 	}
 
 	req, err := http.NewRequest(method, u.String(), strings.NewReader(requestBody))
@@ -63,7 +62,7 @@ func (r *HttpClient) ExecuteGetWithDecodeJson(
 		return http.StatusInternalServerError, err
 	}
 
-	log.Println("URL:", u.String())
+	logger.Logger.Debug().Msg(fmt.Sprintf("URL:%s", u.String()))
 	res, err := r.client.Do(req)
 	if err != nil {
 		return res.StatusCode, err
@@ -106,5 +105,5 @@ func (r *HttpClient) DecodeJsonBody(resp *http.Response, out interface{}) error 
 
 func (r *HttpClient) DecodeByte(resp *http.Response) ([]byte, error) {
 	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }
