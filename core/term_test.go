@@ -1,17 +1,16 @@
-package domain_test
+package core_test
 
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"github.com/tkitsunai/edinet-go/api/domain"
-	v1 "github.com/tkitsunai/edinet-go/api/edinet/api/v1"
+	"github.com/tkitsunai/edinet-go/core"
 	"testing"
 )
 
 func Test開始期間から終了期間までの日付のリストを取得する(t *testing.T) {
-	term := domain.Term{
-		FromDate: v1.FileDate("2019-08-01"),
-		ToDate:   v1.FileDate("2019-08-10"),
+	term := core.Term{
+		FromDate: core.FileDate("2019-08-01"),
+		ToDate:   core.FileDate("2019-08-10"),
 	}
 
 	days := term.DayDuration()

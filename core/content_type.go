@@ -1,4 +1,4 @@
-package driver
+package core
 
 type ContentType string
 

@@ -123,6 +123,12 @@
           },
           "xbrlFlag": {
             "type": "string"
+          },
+          "csvFlag": {
+            "type": "string"
+          },
+          "legalStatus": {
+            "type": "string"
           }
         }
       }

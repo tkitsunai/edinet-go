@@ -1,33 +1,16 @@
-package v1
+package core
 
 import (
 	"errors"
-	"fmt"
 	"github.com/Songmu/go-httpdate"
 	"time"
 )
 
-type RequestType int
-
-func (r RequestType) String() string {
-	return fmt.Sprintf("%d", r)
-}
-
-const (
-	MetaDataOnly RequestType = iota + 1
-	MetaDataAndDocuments
-)
+type FileDate string
 
 const (
 	EdinetDateFormat = "2006-01-02"
 )
-
-type DocumentListRequestParameter struct {
-	FileDate FileDate
-	Type     RequestType
-}
-
-type FileDate string
 
 func NewFileDate(value time.Time) FileDate {
 	return FileDate(value.Format(EdinetDateFormat))
@@ -58,7 +41,3 @@ func (f FileDate) Format() string {
 		return string([]rune(formatted.Format(time.RFC3339))[:10])
 	}
 }
-
-// must be generated struct "DocumentListResponse"
-// gen_document_list.go
-type DocumentContentResponses []*DocumentListResponse

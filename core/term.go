@@ -1,16 +1,15 @@
-package domain
+package core
 
 import (
-	v1 "github.com/tkitsunai/edinet-go/api/edinet/api/v1"
 	"time"
 )
 
 type Term struct {
-	FromDate v1.FileDate
-	ToDate   v1.FileDate
+	FromDate FileDate
+	ToDate   FileDate
 }
 
-func NewTerm(fromDate v1.FileDate, toDate v1.FileDate) Term {
+func NewTerm(fromDate FileDate, toDate FileDate) Term {
 	return Term{
 		FromDate: fromDate,
 		ToDate:   toDate,

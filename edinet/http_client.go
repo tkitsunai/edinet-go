@@ -1,4 +1,4 @@
-package driver
+package edinet
 
 import (
 	"context"
@@ -11,12 +11,12 @@ import (
 	"strings"
 )
 
-type Client struct {
+type HttpClient struct {
 	client *http.Client
 }
 
-func NewClient() *Client {
-	return &Client{
+func NewHttpClient() *HttpClient {
+	return &HttpClient{
 		client: http.DefaultClient,
 	}
 }
@@ -25,7 +25,7 @@ func IsOK(statusCode int) bool {
 	return statusCode >= 200 && statusCode <= 299
 }
 
-func (r *Client) newRequest(
+func (r *HttpClient) newRequest(
 	ctx context.Context,
 	method string,
 	u *url.URL,
@@ -36,7 +36,7 @@ func (r *Client) newRequest(
 
 	var requestBody string
 	if body != nil {
-		reqBody, _ := ioutil.ReadAll(body)
+		reqBody, _ := io.ReadAll(body)
 		requestBody = string(reqBody)
 		log.Println("Request body:", requestBody)
 	}
@@ -53,7 +53,7 @@ func (r *Client) newRequest(
 	return req, nil
 }
 
-func (r *Client) ExecuteGetWithDecodeJson(
+func (r *HttpClient) ExecuteGetWithDecodeJson(
 	ctx context.Context,
 	u *url.URL,
 	out interface{},
@@ -79,7 +79,7 @@ func (r *Client) ExecuteGetWithDecodeJson(
 	return res.StatusCode, nil
 }
 
-func (r *Client) ExecuteGetJsonWithDecodeString(
+func (r *HttpClient) ExecuteGetJsonWithDecodeString(
 	ctx context.Context,
 	url *url.URL,
 ) (responseBody string, statusCode int, err error) {
@@ -98,13 +98,13 @@ func (r *Client) ExecuteGetJsonWithDecodeString(
 	return string(decode), res.StatusCode, nil
 }
 
-func (r *Client) DecodeJsonBody(resp *http.Response, out interface{}) error {
+func (r *HttpClient) DecodeJsonBody(resp *http.Response, out interface{}) error {
 	defer resp.Body.Close()
 	decoder := json.NewDecoder(resp.Body)
 	return decoder.Decode(out)
 }
 
-func (r *Client) DecodeByte(resp *http.Response) ([]byte, error) {
+func (r *HttpClient) DecodeByte(resp *http.Response) ([]byte, error) {
 	defer resp.Body.Close()
 	return ioutil.ReadAll(resp.Body)
 }
