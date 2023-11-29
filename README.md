@@ -21,19 +21,13 @@ Please check the official website for how to issue API key. [Refs](https://discl
 mkdir -p ${HOME}/.edinet-go && echo 'apiKey : "xxxx"' > ${HOME}/.edinet-go/.edinet-apikey.yml
 ```
 
-### Run
-
-Launch the built binary file.
+### Run with Air
 
 ```bash
-go install https://github.com/goreleaser/goreleaser@latest
-goreleaser build
-```
-
-```bash
-./dist/YOUR-ARCH/edinet-go
+make setup
+make run
 ```
 
 ## License
 
-My awesome project is licensed under the [Apache License 2.0](LICENSE).
+edinet-go is licensed under the [Apache License 2.0](LICENSE).
