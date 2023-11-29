@@ -2,9 +2,9 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/samber/do"
 	"github.com/tkitsunai/edinet-go/conf"
 	"github.com/tkitsunai/edinet-go/datastore"
-	"github.com/tkitsunai/edinet-go/edinet"
 	"github.com/tkitsunai/edinet-go/usecase"
 	"net"
 )
@@ -12,9 +12,10 @@ import (
 type Server struct {
 	app         *fiber.App
 	storeEngine datastore.Engine
+	i           *do.Injector
 }
 
-func NewServer(storeEngine datastore.Engine) *Server {
+func NewServer(storeEngine datastore.Engine, injector *do.Injector) *Server {
 	s := &Server{
 		app: fiber.New(fiber.Config{
 			Prefork:      false,
@@ -22,18 +23,15 @@ func NewServer(storeEngine datastore.Engine) *Server {
 			ServerHeader: "edinet-go",
 		}),
 		storeEngine: storeEngine,
+		i:           injector,
 	}
 	s.setHandlers()
 	return s
 }
 
 func (s *Server) setHandlers() {
-	key := conf.LoadConfig().ApiKey
-	client := edinet.NewClient(key)
-
-	overview := usecase.NewOverview(client)
-	document := usecase.NewDocument(client)
-
+	overview := do.MustInvoke[*usecase.Overview](s.i)
+	document := do.MustInvoke[*usecase.Document](s.i)
 	docResources := NewDocumentsResource(overview, document)
 
 	s.app.Get("/documents", docResources.GetDocumentsByTerm)

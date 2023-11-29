@@ -68,6 +68,7 @@ func (f *File) NameWithExtension() string {
 	return f.Name + f.Extension
 }
 
+// DocumentContentResponses
 // must be generated struct "DocumentListResponse"
 // gen_document_list.go
 type DocumentContentResponses []*DocumentListResponse

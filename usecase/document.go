@@ -1,19 +1,24 @@
 package usecase
 
-import "github.com/tkitsunai/edinet-go/edinet"
+import (
+	"github.com/samber/do"
+	"github.com/tkitsunai/edinet-go/edinet"
+	"github.com/tkitsunai/edinet-go/port"
+)
 
 type Document struct {
-	Client *edinet.Client
+	docPort port.Document
 }
 
-func NewDocument(client *edinet.Client) *Document {
+func NewDocument(i *do.Injector) (*Document, error) {
+	docPort := do.MustInvoke[port.Document](i)
 	return &Document{
-		Client: client,
-	}
+		docPort: docPort,
+	}, nil
 }
 
-func (c *Document) FindContentById(id edinet.DocumentId, fileType edinet.FileType) (edinet.File, error) {
-	document, err := c.Client.RequestDocument(id, fileType)
+func (c *Document) FindContent(id edinet.DocumentId, fileType edinet.FileType) (edinet.File, error) {
+	document, err := c.docPort.Get(id, fileType)
 	if err != nil {
 		return edinet.File{}, err
 	}

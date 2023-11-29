@@ -13,7 +13,10 @@ type Documents struct {
 	documentUsecase *usecase.Document
 }
 
-func NewDocumentsResource(overview *usecase.Overview, docUsecase *usecase.Document) *Documents {
+func NewDocumentsResource(
+	overview *usecase.Overview,
+	docUsecase *usecase.Document,
+) *Documents {
 	return &Documents{
 		overviewUsecase: overview,
 		documentUsecase: docUsecase,
@@ -92,7 +95,7 @@ func (d *Documents) GetDocument(ctx *fiber.Ctx) error {
 		})
 	}
 
-	document, err := d.documentUsecase.FindContentById(documentId, fileType)
+	document, err := d.documentUsecase.FindContent(documentId, fileType)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"status":  http.StatusInternalServerError,
@@ -100,7 +103,6 @@ func (d *Documents) GetDocument(ctx *fiber.Ctx) error {
 		})
 	}
 
-	// download file
 	ctx.Set("Content-Disposition", "attachment; filename="+document.NameWithExtension())
 	return ctx.Send(document.Content)
 }

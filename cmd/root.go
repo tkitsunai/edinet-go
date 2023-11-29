@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/tkitsunai/edinet-go/conf"
 	"github.com/tkitsunai/edinet-go/datastore"
+	"github.com/tkitsunai/edinet-go/di"
 	"github.com/tkitsunai/edinet-go/logger"
 	"github.com/tkitsunai/edinet-go/server"
 	"os"
@@ -33,7 +34,9 @@ var rootCmd = &cobra.Command{
 		}
 		defer storage.Close()
 
-		s := server.NewServer(storage)
+		injector := di.GetDIContainer()
+
+		s := server.NewServer(storage, injector)
 
 		return s.Run()
 	},

@@ -3,27 +3,30 @@ package usecase
 import (
 	"fmt"
 	"github.com/hashicorp/go-multierror"
+	"github.com/samber/do"
 	"github.com/tkitsunai/edinet-go/core"
 	"github.com/tkitsunai/edinet-go/edinet"
 	"github.com/tkitsunai/edinet-go/logger"
+	"github.com/tkitsunai/edinet-go/port"
 	"sync"
 	"time"
 )
 
 type Overview struct {
-	Client *edinet.Client
+	ovPort port.Overview
 }
 
-func NewOverview(client *edinet.Client) *Overview {
+func NewOverview(i *do.Injector) (*Overview, error) {
+	ovPort := do.MustInvoke[port.Overview](i)
 	return &Overview{
-		Client: client,
-	}
+		ovPort: ovPort,
+	}, nil
 }
 
 func (t *Overview) FindOverviewByDate(date core.FileDate) ([]*edinet.DocumentListResponse, error) {
 	var results []*edinet.DocumentListResponse
 
-	doc, err := t.Client.RequestDocumentList(date)
+	doc, err := t.ovPort.Get(date)
 
 	results = append(results, doc)
 
@@ -43,7 +46,7 @@ func (t *Overview) FindOverviewByTerm(term core.Term) ([]*edinet.DocumentListRes
 			go func() {
 				defer wg.Done()
 				meg.Go(func() error {
-					res, err := t.Client.RequestDocumentList(core.NewFileDate(date))
+					res, err := t.ovPort.Get(core.NewFileDate(date))
 					if err != nil {
 						return err
 					}

@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/samber/do"
+	"github.com/tkitsunai/edinet-go/conf"
 	"github.com/tkitsunai/edinet-go/core"
 	"io"
 	"log"
@@ -19,7 +21,6 @@ type Client struct {
 
 const (
 	v2              string = "v2"
-	v1              string = "v1"
 	Base            string = "https://disclosure.edinet-fsa.go.jp/api/"
 	SubscriptionKey string = "Subscription-Key"
 )
@@ -28,7 +29,9 @@ var (
 	apiError = errors.New("[warning] API http status code was not ok")
 )
 
-func NewClient(apiKey string) *Client {
+func NewClient(i *do.Injector) (*Client, error) {
+	config := do.MustInvoke[*conf.Config](i)
+
 	u, err := url.Parse(Base + v2)
 	if err != nil {
 		panic("parse base url error")
@@ -36,13 +39,13 @@ func NewClient(apiKey string) *Client {
 	return &Client{
 		baseUrl:    u,
 		httpClient: NewHttpClient(),
-		apiKey:     apiKey,
-	}
+		apiKey:     config.ApiKey,
+	}, nil
 }
 
 func (c *Client) URL() *url.URL {
-	copy := *c.baseUrl
-	return &copy
+	baseUrl := *c.baseUrl
+	return &baseUrl
 }
 
 func (c *Client) RequestDocumentList(date core.FileDate) (*DocumentListResponse, error) {
