@@ -1,5 +1,5 @@
 bin/*
 !bin/.gitkeep
 dist/
-
+tmp/
 .edinet-apikey.yml
