@@ -1,6 +1,10 @@
 package cmd
 
 import (
+	"fmt"
+	"github.com/tkitsunai/edinet-go/conf"
+	"github.com/tkitsunai/edinet-go/datastore"
+	"github.com/tkitsunai/edinet-go/logger"
 	"github.com/tkitsunai/edinet-go/server"
 	"os"
 
@@ -13,7 +17,24 @@ var rootCmd = &cobra.Command{
 	Short: "edinet-go",
 	Long:  `edinet-go`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s := server.NewServer()
+		var storage datastore.Engine
+		persistent := conf.LoadServerConfig().Persistent
+		persistence := persistent.IsPersistence()
+		if persistence {
+			storage = datastore.GetEngineByName(persistent.Engine)
+		} else {
+			storage = datastore.DefaultEngine
+		}
+
+		err := storage.Open()
+		if err != nil {
+			logger.Logger.Error().Msg(fmt.Sprintf("storage open failed %s", err))
+			return err
+		}
+		defer storage.Close()
+
+		s := server.NewServer(storage)
+
 		return s.Run()
 	},
 }

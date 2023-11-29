@@ -25,7 +25,6 @@ func init() {
 func readConfig() {
 	v := viper.New()
 	v.SetConfigFile(".edinet-apikey.yml")
-
 	usr, err := user.Current()
 	if err != nil {
 		fmt.Println("Error getting user information:", err)
@@ -76,7 +75,19 @@ func readServerConfig() {
 }
 
 type ServerConfig struct {
-	Port string `yaml:"port"`
+	Port       string     `yaml:"port"`
+	Persistent Persistent `yaml:"persistent"`
+}
+
+type Persistent struct {
+	Engine string `yaml:"engine"`
+}
+
+func (p *Persistent) IsPersistence() bool {
+	if len(p.Engine) > 0 {
+		return true
+	}
+	return false
 }
 
 type Config struct {
