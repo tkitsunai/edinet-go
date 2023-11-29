@@ -5,16 +5,21 @@ import (
 	"github.com/spf13/viper"
 	"os/user"
 	"path/filepath"
+	"sync"
 )
 
 var (
 	config       Config
 	serverConfig ServerConfig
+
+	once sync.Once
 )
 
 func init() {
-	readConfig()
-	readServerConfig()
+	once.Do(func() {
+		readConfig()
+		readServerConfig()
+	})
 }
 
 func readConfig() {
@@ -41,8 +46,6 @@ func readConfig() {
 	if err != nil {
 		panic(".edinet-apikey.yml unmarshal error.")
 	}
-
-	logConfig(config)
 }
 
 func readServerConfig() {
@@ -70,8 +73,6 @@ func readServerConfig() {
 	if err != nil {
 		panic(".edinet-go.yml unmarshal error.")
 	}
-
-	logConfig(serverConfig)
 }
 
 type ServerConfig struct {
@@ -80,10 +81,6 @@ type ServerConfig struct {
 
 type Config struct {
 	ApiKey string `yaml:"apikey"`
-}
-
-func logConfig(load interface{}) {
-	fmt.Printf("loaded config file.\n%+v\n", load)
 }
 
 func LoadConfig() *Config {
