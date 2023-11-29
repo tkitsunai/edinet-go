@@ -1,3 +1,4 @@
+![build status](https://github.com/tkitsunai/edinet-go/actions/workflows/go-build.yml/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/tkitsunai/edinet-go)](https://goreportcard.com/report/github.com/tkitsunai/edinet-go)
 
 # edinet-go

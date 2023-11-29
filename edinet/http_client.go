@@ -21,11 +21,11 @@ func NewHttpClient() *HttpClient {
 	}
 }
 
-func IsOK(statusCode int) bool {
+func isSuccessful(statusCode int) bool {
 	return statusCode >= 200 && statusCode <= 299
 }
 
-func (r *HttpClient) newRequest(
+func (r *HttpClient) NewRequest(
 	ctx context.Context,
 	method string,
 	u *url.URL,
@@ -57,7 +57,7 @@ func (r *HttpClient) ExecuteGetWithDecodeJson(
 	u *url.URL,
 	out interface{},
 ) (statusCode int, err error) {
-	req, err := r.newRequest(ctx, http.MethodGet, u, "application/json", nil)
+	req, err := r.NewRequest(ctx, http.MethodGet, u, "application/json", nil)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -68,7 +68,7 @@ func (r *HttpClient) ExecuteGetWithDecodeJson(
 		return res.StatusCode, err
 	}
 
-	if IsOK(res.StatusCode) {
+	if isSuccessful(res.StatusCode) {
 		err = r.DecodeJsonBody(res, out)
 		if err != nil {
 			return res.StatusCode, err
@@ -82,7 +82,7 @@ func (r *HttpClient) ExecuteGetJsonWithDecodeString(
 	ctx context.Context,
 	url *url.URL,
 ) (responseBody string, statusCode int, err error) {
-	req, err := r.newRequest(ctx, http.MethodGet, url, "application/json", nil)
+	req, err := r.NewRequest(ctx, http.MethodGet, url, "application/json", nil)
 	if err != nil {
 		return "", http.StatusInternalServerError, err
 	}

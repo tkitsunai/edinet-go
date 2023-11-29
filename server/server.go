@@ -3,28 +3,39 @@ package server
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/tkitsunai/edinet-go/conf"
+	"github.com/tkitsunai/edinet-go/edinet"
+	"github.com/tkitsunai/edinet-go/usecase"
 )
 
 type Server struct {
 	app *fiber.App
 }
 
-func init() {
+func NewServer() *Server {
+	s := &Server{
+		app: fiber.New(fiber.Config{
+			Prefork: true,
+			AppName: "EDINET-GO",
+		}),
+	}
+	s.setHandlers()
+	return s
 }
 
 func (s *Server) setHandlers() {
-	docResources := NewDocumentsResource(conf.LoadConfig().ApiKey)
+
+	key := conf.LoadConfig().ApiKey
+	client := edinet.NewClient(key)
+
+	overview := usecase.NewOverview(client)
+	document := usecase.NewDocument(client)
+
+	docResources := NewDocumentsResource(overview, document)
+
 	s.app.Get("/documents", docResources.GetDocumentsByTerm)
+	s.app.Get("/documents/:id", docResources.GetDocument)
 }
 
 func (s *Server) Run() error {
 	return s.app.Listen(":" + conf.LoadServerConfig().Port)
-}
-
-func NewServer() *Server {
-	s := &Server{
-		app: fiber.New(),
-	}
-	s.setHandlers()
-	return s
 }

@@ -16,23 +16,18 @@ func NewTerm(fromDate FileDate, toDate FileDate) Term {
 	}
 }
 
-type Days []time.Time
+type DateRange []time.Time
 
-func (t Term) DayDuration() Days {
+func (t *Term) GetDateRange() DateRange {
 	from, to := t.fromTo()
-	diff := to.Sub(from)
-	hours := int(diff.Hours())
-	dayCount := hours / 24
-	var days []time.Time
-	days = append(days, from)
-	for i := 1; i < dayCount; i++ {
-		days = append(days, from.AddDate(0, 0, i))
+	var dateRange []time.Time
+	for current := from; !current.After(to); current = current.Add(24 * time.Hour) {
+		dateRange = append(dateRange, current)
 	}
-	days = append(days, to)
-	return days
+	return dateRange
 }
 
-func (t Term) fromTo() (from time.Time, to time.Time) {
+func (t *Term) fromTo() (from time.Time, to time.Time) {
 	fromDate, _ := t.FromDate.Validate()
 	toDate, _ := t.ToDate.Validate()
 	return *fromDate, *toDate

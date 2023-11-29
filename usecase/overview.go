@@ -9,17 +9,17 @@ import (
 	"time"
 )
 
-type OverviewTerm struct {
+type Overview struct {
 	Client *edinet.Client
 }
 
-func NewOverviewTerm(apiKey string) *OverviewTerm {
-	return &OverviewTerm{
-		Client: edinet.NewClient(apiKey),
+func NewOverview(client *edinet.Client) *Overview {
+	return &Overview{
+		Client: client,
 	}
 }
 
-func (t *OverviewTerm) FindOverviewByDate(date core.FileDate) ([]*edinet.DocumentListResponse, error) {
+func (t *Overview) FindOverviewByDate(date core.FileDate) ([]*edinet.DocumentListResponse, error) {
 	var results []*edinet.DocumentListResponse
 
 	doc, err := t.Client.RequestDocumentList(date)
@@ -29,30 +29,30 @@ func (t *OverviewTerm) FindOverviewByDate(date core.FileDate) ([]*edinet.Documen
 	return results, err
 }
 
-func (t *OverviewTerm) FindOverviewByTerm(term core.Term) ([]*edinet.DocumentListResponse, []error) {
-	days := term.DayDuration()
+func (t *Overview) FindOverviewByTerm(term core.Term) ([]*edinet.DocumentListResponse, []error) {
+	dateRange := term.GetDateRange()
 
 	var errorsPack []error
 	var results []*edinet.DocumentListResponse
 
 	var mutex = &sync.Mutex{}
 	wg := sync.WaitGroup{}
-	for _, day := range days {
+	for _, date := range dateRange {
 		wg.Add(1)
 		mutex.Lock()
-		go func(day time.Time) {
+		go func(date time.Time) {
 			defer wg.Done()
-			res, err := t.Client.RequestDocumentList(core.NewFileDate(day))
+			res, err := t.Client.RequestDocumentList(core.NewFileDate(date))
 			if err != nil {
 				errorsPack = append(errorsPack, err)
 			}
 			results = append(results, res)
 			mutex.Unlock()
-		}(day)
+		}(date)
 	}
 	wg.Wait()
 
-	logger.Logger.Info().Msg(fmt.Sprintf("Day Size: %d", len(days)))
+	logger.Logger.Info().Msg(fmt.Sprintf("Day Size: %d", len(dateRange)))
 	logger.Logger.Info().Msg(fmt.Sprintf("Response Success Size: %d", len(results)))
 
 	return results, errorsPack

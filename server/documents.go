@@ -9,16 +9,18 @@ import (
 )
 
 type Documents struct {
-	useCase *usecase.OverviewTerm
+	overviewUsecase *usecase.Overview
+	documentUsecase *usecase.Document
 }
 
-func NewDocumentsResource(apiKey string) *Documents {
+func NewDocumentsResource(overview *usecase.Overview, docUsecase *usecase.Document) *Documents {
 	return &Documents{
-		useCase: usecase.NewOverviewTerm(apiKey),
+		overviewUsecase: overview,
+		documentUsecase: docUsecase,
 	}
 }
 
-func (d *Documents) GetDocuments(ctx *fiber.Ctx) error {
+func (d *Documents) GetDocumentsByDate(ctx *fiber.Ctx) error {
 	p := FileDateParam{}
 	err := ctx.ParamsParser(&p)
 
@@ -26,7 +28,7 @@ func (d *Documents) GetDocuments(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	overviews, err := d.useCase.FindOverviewByDate(core.FileDate(p.Date))
+	overviews, err := d.overviewUsecase.FindOverviewByDate(core.FileDate(p.Date))
 
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
@@ -43,7 +45,7 @@ func (d *Documents) GetDocuments(ctx *fiber.Ctx) error {
 }
 
 func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
-	p := FileTermParam{}
+	p := FileTermParams{}
 	err := ctx.QueryParser(&p)
 
 	if err != nil {
@@ -57,7 +59,7 @@ func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
 
 	term := core.NewTerm(from, to)
 
-	overviews, errs := d.useCase.FindOverviewByTerm(term)
+	overviews, errs := d.overviewUsecase.FindOverviewByTerm(term)
 
 	if errs != nil && len(errs) > 0 {
 		return ctx.Status(http.StatusInternalServerError).SendString(errs[0].Error())
@@ -73,11 +75,38 @@ func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
 	})
 }
 
+func (d *Documents) GetDocument(ctx *fiber.Ctx) error {
+	did := ctx.Params("id")
+	documentId := edinet.DocumentId(did)
+
+	query := ctx.Query("type")
+	fileType := edinet.NewFileTypeByName(query)
+
+	if fileType == edinet.Unknown {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"status":  http.StatusBadRequest,
+			"message": "request parameter invalid. parameter name 'type' is required",
+		})
+	}
+
+	document, err := d.documentUsecase.FindContentById(documentId, fileType)
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"status":  http.StatusInternalServerError,
+			"message": err.Error(),
+		})
+	}
+
+	// download file
+	ctx.Set("Content-Disposition", "attachment; filename="+document.NameWithExtension())
+	return ctx.Send(document.Content)
+}
+
 type FileDateParam struct {
 	Date string
 }
 
-type FileTermParam struct {
+type FileTermParams struct {
 	From string `query:"from"`
 	To   string `query:"to"`
 }
