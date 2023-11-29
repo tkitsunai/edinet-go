@@ -59,10 +59,13 @@ func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
 
 	term := core.NewTerm(from, to)
 
-	overviews, errs := d.overviewUsecase.FindOverviewByTerm(term)
+	overviews, err := d.overviewUsecase.FindOverviewByTerm(term)
 
-	if errs != nil && len(errs) > 0 {
-		return ctx.Status(http.StatusInternalServerError).SendString(errs[0].Error())
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"status":  http.StatusInternalServerError,
+			"message": err.Error(),
+		})
 	}
 
 	res := make([]edinet.DocumentListResponse, len(overviews))

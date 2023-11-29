@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"fmt"
+	"github.com/hashicorp/go-multierror"
 	"github.com/tkitsunai/edinet-go/core"
 	"github.com/tkitsunai/edinet-go/edinet"
 	"github.com/tkitsunai/edinet-go/logger"
@@ -29,31 +30,45 @@ func (t *Overview) FindOverviewByDate(date core.FileDate) ([]*edinet.DocumentLis
 	return results, err
 }
 
-func (t *Overview) FindOverviewByTerm(term core.Term) ([]*edinet.DocumentListResponse, []error) {
+func (t *Overview) FindOverviewByTerm(term core.Term) ([]*edinet.DocumentListResponse, error) {
 	dateRange := term.GetDateRange()
-
-	var errorsPack []error
 	var results []*edinet.DocumentListResponse
 
-	var mutex = &sync.Mutex{}
-	wg := sync.WaitGroup{}
+	var resultsLock = sync.Mutex{}
+	var meg multierror.Group
+	var wg sync.WaitGroup
 	for _, date := range dateRange {
-		wg.Add(1)
-		mutex.Lock()
-		go func(date time.Time) {
-			defer wg.Done()
-			res, err := t.Client.RequestDocumentList(core.NewFileDate(date))
-			if err != nil {
-				errorsPack = append(errorsPack, err)
-			}
-			results = append(results, res)
-			mutex.Unlock()
-		}(date)
+		runAsync := func(date time.Time) {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				meg.Go(func() error {
+					res, err := t.Client.RequestDocumentList(core.NewFileDate(date))
+					if err != nil {
+						return err
+					}
+					resultsLock.Lock()
+					results = append(results, res)
+					resultsLock.Unlock()
+					return nil
+				})
+			}()
+		}
+		runAsync(date)
 	}
 	wg.Wait()
+	waitedError := meg.Wait()
+
+	var err error
+
+	if waitedError != nil {
+		for _, goerr := range waitedError.Errors {
+			err = multierror.Append(err, goerr)
+		}
+	}
 
 	logger.Logger.Info().Msg(fmt.Sprintf("Day Size: %d", len(dateRange)))
 	logger.Logger.Info().Msg(fmt.Sprintf("Response Success Size: %d", len(results)))
 
-	return results, errorsPack
+	return results, err
 }

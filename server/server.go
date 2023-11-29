@@ -5,6 +5,7 @@ import (
 	"github.com/tkitsunai/edinet-go/conf"
 	"github.com/tkitsunai/edinet-go/edinet"
 	"github.com/tkitsunai/edinet-go/usecase"
+	"net"
 )
 
 type Server struct {
@@ -23,7 +24,6 @@ func NewServer() *Server {
 }
 
 func (s *Server) setHandlers() {
-
 	key := conf.LoadConfig().ApiKey
 	client := edinet.NewClient(key)
 
@@ -37,5 +37,5 @@ func (s *Server) setHandlers() {
 }
 
 func (s *Server) Run() error {
-	return s.app.Listen(":" + conf.LoadServerConfig().Port)
+	return s.app.Listen(net.JoinHostPort("", conf.LoadServerConfig().Port))
 }

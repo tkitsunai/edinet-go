@@ -32,7 +32,6 @@ func (r *HttpClient) NewRequest(
 	contentType string,
 	body io.Reader,
 ) (*http.Request, error) {
-	logger.Logger.Debug().Msg(fmt.Sprintf("Request to:%s", u.String()))
 	var requestBody string
 	if body != nil {
 		reqBody, _ := io.ReadAll(body)
