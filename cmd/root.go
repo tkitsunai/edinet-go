@@ -34,7 +34,7 @@ var rootCmd = &cobra.Command{
 		}
 		defer storage.Close()
 
-		injector := di.GetDIContainer()
+		injector := di.SetUpContainer(storage.GetDriver())
 
 		s := server.NewServer(storage, injector)
 

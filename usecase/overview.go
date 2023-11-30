@@ -46,7 +46,17 @@ func (t *Overview) FindOverviewByTerm(term core.Term) ([]*edinet.DocumentListRes
 			go func() {
 				defer wg.Done()
 				meg.Go(func() error {
-					res, err := t.ovPort.Get(core.NewFileDate(date))
+					fileDate := core.NewFileDate(date)
+					// data store exists, using stored data.
+					if store, err := t.ovPort.GetByStore(fileDate); err == nil {
+						logger.Logger.Info().Msg(fmt.Sprintf("find stored data. %s", fileDate))
+						resultsLock.Lock()
+						results = append(results, store)
+						resultsLock.Unlock()
+						return nil
+					}
+
+					res, err := t.ovPort.Get(fileDate)
 					if err != nil {
 						return err
 					}
@@ -72,6 +82,10 @@ func (t *Overview) FindOverviewByTerm(term core.Term) ([]*edinet.DocumentListRes
 
 	logger.Logger.Info().Msg(fmt.Sprintf("Day Size: %d", len(dateRange)))
 	logger.Logger.Info().Msg(fmt.Sprintf("Response Success Size: %d", len(results)))
+
+	for _, data := range results {
+		logger.Logger.Info().Msg(fmt.Sprintf("Day: %s Document Results Size: %d", data.Metadata.Parameter.Date, len(data.Results)))
+	}
 
 	return results, err
 }
