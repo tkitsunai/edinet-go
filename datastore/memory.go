@@ -4,12 +4,17 @@ type Memory struct {
 	db map[string]interface{}
 }
 
+func (m *Memory) FindByKey(table, key string) ([]byte, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m *Memory) Batch(table string, dataWithKey map[string]interface{}) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (m *Memory) View(table, key string) ([][]byte, error) {
+func (m *Memory) FindAll(table string) ([][]byte, error) {
 	//TODO implement me
 	panic("implement me")
 }

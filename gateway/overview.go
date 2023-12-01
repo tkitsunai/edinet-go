@@ -30,25 +30,20 @@ func (o *Overview) GetByStore(date core.FileDate) (*edinet.DocumentListResponse,
 		Metadata: edinet.Metadata{},
 		Results:  make([]edinet.Result, 0),
 	}
+
 	// メタデータの取得
-	findMetaData, err := o.db.View("metadata", date.String())
+	findMetaData, err := o.db.FindByKey("metadata", date.String())
 	if err != nil {
 		return nil, err
 	}
-	if len(findMetaData) == 1 {
-		// metadata decode
-		metadata := findMetaData[0]
-		decodedMetaData, err := decode[edinet.Metadata](metadata)
-		if err != nil {
-			// metadata decode failed
-			logger.Logger.Info().Msg("metadata decode failed")
-			return nil, err
-		}
-		res.Metadata = decodedMetaData
+	decodedMetaData, err := decode[edinet.Metadata](findMetaData)
+	if err != nil {
+		return nil, err
 	}
+	res.Metadata = decodedMetaData
 
 	// 日付データの取得
-	foundResults, err := o.db.View(date.String(), "")
+	foundResults, err := o.db.FindAll(date.String())
 
 	results := make([]edinet.Result, len(foundResults))
 	for i, result := range foundResults {

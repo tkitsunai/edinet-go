@@ -8,7 +8,8 @@ type Engine interface {
 
 // Driver interfaces for persistent storage
 type Driver interface {
-	View(table, key string) ([][]byte, error)
+	FindByKey(table, key string) ([]byte, error)
+	FindAll(table string) ([][]byte, error)
 	Update(table, key string, data interface{}) error
 	Batch(table string, dataWithKey map[string]interface{}) error
 }

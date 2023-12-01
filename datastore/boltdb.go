@@ -48,8 +48,29 @@ func (b *BoltDB) GetDriver() Driver {
 	return b
 }
 
-func (b *BoltDB) View(bucketKey, key string) ([][]byte, error) {
-	logger.Logger.Info().Msg(fmt.Sprintf("bucketKey: %s, key %s", bucketKey, key))
+func (b *BoltDB) FindByKey(bucketKey, key string) ([]byte, error) {
+	if len(key) == 0 {
+		return nil, nil
+	}
+	var result []byte
+	err := b.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketKey))
+		if bucket == nil {
+			return fmt.Errorf("bucket not found")
+		}
+
+		keyData := bucket.Get([]byte(key))
+		if keyData == nil {
+			return fmt.Errorf(fmt.Sprintf("data not found key: %s", key))
+		}
+		result = keyData
+		return nil
+	})
+	return result, err
+}
+
+func (b *BoltDB) FindAll(bucketKey string) ([][]byte, error) {
+	logger.Logger.Info().Msgf("bucketKey: %s", bucketKey)
 	var resultsLock sync.Mutex
 	results := make([][]byte, 0)
 	resultsLock.Lock()
@@ -61,28 +82,7 @@ func (b *BoltDB) View(bucketKey, key string) ([][]byte, error) {
 			return fmt.Errorf("bucket not found")
 		}
 
-		// key指定
-		if len(key) > 0 {
-			keyData := bucket.Get([]byte(key))
-			if keyData == nil {
-				return fmt.Errorf(fmt.Sprintf("data not found key: %s", key))
-			}
-			results = append(results, keyData)
-			return nil
-		}
-
-		// 全データ検索
 		err := bucket.ForEach(func(k, v []byte) error {
-			//// 一致したキーをappend
-			//if bytes.Equal([]byte(key), k) && key != "" {
-			//	logger.Logger.Info().Msg(fmt.Sprintf("key一致 key: %s, k: %s", key, k))
-			//	addData := make([]byte, 1)
-			//	copy(addData, v)
-			//	results = append(results, addData)
-			//	return nil
-			//}
-			//logger.Logger.Info().Msg(fmt.Sprintf("key不一致 key: %s, k: %s", key, k))
-			// キーの指定がない場合はすべて入れる
 			results = append(results, v)
 			return nil
 		})
@@ -100,7 +100,7 @@ func (b *BoltDB) View(bucketKey, key string) ([][]byte, error) {
 }
 
 func (b *BoltDB) Update(bucketKey, key string, data interface{}) error {
-	logger.Logger.Debug().Msg(fmt.Sprintf("store: %+v", data))
+	logger.Logger.Debug().Msgf("store: %+v", data)
 	err := b.db.Update(func(tx *bolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists([]byte(bucketKey))
 		if err != nil {

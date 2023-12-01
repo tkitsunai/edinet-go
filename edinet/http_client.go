@@ -3,7 +3,6 @@ package edinet
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/tkitsunai/edinet-go/logger"
 	"io"
 	"net/http"
@@ -36,7 +35,7 @@ func (r *HttpClient) NewRequest(
 	if body != nil {
 		reqBody, _ := io.ReadAll(body)
 		requestBody = string(reqBody)
-		logger.Logger.Debug().Msg(fmt.Sprintf("Request body:%s", requestBody))
+		logger.Logger.Debug().Msgf("Request body:%s", requestBody)
 	}
 
 	req, err := http.NewRequest(method, u.String(), strings.NewReader(requestBody))
@@ -61,7 +60,7 @@ func (r *HttpClient) ExecuteGetWithDecodeJson(
 		return http.StatusInternalServerError, err
 	}
 
-	logger.Logger.Debug().Msg(fmt.Sprintf("URL:%s", u.String()))
+	logger.Logger.Debug().Msgf("URL:%s", u.String())
 	res, err := r.client.Do(req)
 	if err != nil {
 		return res.StatusCode, err

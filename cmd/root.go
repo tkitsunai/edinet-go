@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/tkitsunai/edinet-go/conf"
 	"github.com/tkitsunai/edinet-go/datastore"
 	"github.com/tkitsunai/edinet-go/di"
@@ -29,7 +28,7 @@ var rootCmd = &cobra.Command{
 
 		err := storage.Open()
 		if err != nil {
-			logger.Logger.Error().Msg(fmt.Sprintf("storage open failed %s", err))
+			logger.Logger.Error().Msgf("storage open failed %s", err)
 			return err
 		}
 		defer storage.Close()
