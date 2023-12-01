@@ -9,8 +9,8 @@ import (
 
 func Test開始期間から終了期間までが三日間の場合三つの日付リストが取得できる(t *testing.T) {
 	term := core.Term{
-		FromDate: core.FileDate("2019-08-01"),
-		ToDate:   core.FileDate("2019-08-03"),
+		FromDate: core.Date("2019-08-01"),
+		ToDate:   core.Date("2019-08-03"),
 	}
 
 	dateRange := term.GetDateRange()
@@ -22,8 +22,8 @@ func Test開始期間から終了期間までが三日間の場合三つの日�
 
 func Test開始期間から終了期間までが二日間の場合二つの日付リストが取得できる(t *testing.T) {
 	term := core.Term{
-		FromDate: core.FileDate("2023-11-29"),
-		ToDate:   core.FileDate("2023-11-30"),
+		FromDate: core.Date("2023-11-29"),
+		ToDate:   core.Date("2023-11-30"),
 	}
 
 	dateRange := term.GetDateRange()
@@ -35,8 +35,8 @@ func Test開始期間から終了期間までが二日間の場合二つの日�
 
 func Test開始と終了期間が同じ場合は一つの日付リストが取得できる(t *testing.T) {
 	term := core.Term{
-		FromDate: core.FileDate("2023-11-29"),
-		ToDate:   core.FileDate("2023-11-29"),
+		FromDate: core.Date("2023-11-29"),
+		ToDate:   core.Date("2023-11-29"),
 	}
 
 	dateRange := term.GetDateRange()

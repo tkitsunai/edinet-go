@@ -48,11 +48,11 @@ func (c *Client) URL() *url.URL {
 	return &baseUrl
 }
 
-func (c *Client) RequestDocumentList(date core.FileDate) (*DocumentListResponse, error) {
+func (c *Client) RequestDocumentList(date core.Date) (*DocumentListResponse, error) {
 	u := c.URL()
 	u.Path = path.Join(u.Path, "documents.json")
 	q := u.Query()
-	q.Set("date", date.Format())
+	q.Set("date", date.String())
 	q.Set("type", MetaDataAndDocuments.String())
 	q.Set(SubscriptionKey, c.apiKey)
 	u.RawQuery = q.Encode()

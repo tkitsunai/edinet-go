@@ -53,7 +53,7 @@ func NewFileTypeByName(name string) FileType {
 }
 
 type DocumentListRequestParameter struct {
-	FileDate core.FileDate
+	FileDate core.Date
 	Type     RequestType
 }
 

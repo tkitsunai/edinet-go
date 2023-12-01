@@ -18,6 +18,7 @@ func init() {
 			Out:        os.Stdout,
 			TimeFormat: time.RFC3339,
 		}
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		Logger = zerolog.New(output).With().Timestamp().Caller().Logger()
 	})
 }

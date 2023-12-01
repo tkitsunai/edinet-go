@@ -100,7 +100,6 @@ func (b *BoltDB) FindAll(bucketKey string) ([][]byte, error) {
 }
 
 func (b *BoltDB) Update(bucketKey, key string, data interface{}) error {
-	logger.Logger.Debug().Msgf("store: %+v", data)
 	err := b.db.Update(func(tx *bolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists([]byte(bucketKey))
 		if err != nil {

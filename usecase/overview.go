@@ -21,7 +21,7 @@ func NewOverview(i *do.Injector) (*Overview, error) {
 	}, nil
 }
 
-func (t *Overview) FindOverviewByDate(date core.FileDate) ([]*edinet.DocumentListResponse, error) {
+func (t *Overview) FindOverviewByDate(date core.Date) ([]*edinet.DocumentListResponse, error) {
 	var results []*edinet.DocumentListResponse
 	doc, err := t.ovPort.Get(date)
 	results = append(results, doc)
@@ -35,19 +35,18 @@ func (t *Overview) FindOverviewByTerm(term core.Term) ([]*edinet.DocumentListRes
 	var meg multierror.Group
 
 	for _, date := range dateRange {
-		fileDate := core.NewFileDate(date)
-		runAsync := func(fileDate core.FileDate) {
+		runAsync := func(date core.Date) {
 			mu.Lock()
 			defer mu.Unlock()
 			meg.Go(func() error {
 				// data store exists, using stored data.
-				if store, err := t.ovPort.GetByStore(fileDate); err == nil {
-					logger.Logger.Info().Msgf("find stored data. %s", fileDate)
+				if store, err := t.ovPort.GetByStore(date); err == nil {
+					logger.Logger.Info().Msgf("find stored data. %s", date)
 					results = append(results, store)
 					return nil
 				}
 
-				res, err := t.ovPort.Get(fileDate)
+				res, err := t.ovPort.Get(date)
 				if err != nil {
 					return err
 				}
@@ -55,7 +54,7 @@ func (t *Overview) FindOverviewByTerm(term core.Term) ([]*edinet.DocumentListRes
 				return nil
 			})
 		}
-		runAsync(fileDate)
+		runAsync(date)
 	}
 	waitedError := meg.Wait()
 

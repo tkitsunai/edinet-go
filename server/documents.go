@@ -31,7 +31,7 @@ func (d *Documents) GetDocumentsByDate(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	overviews, err := d.overviewUsecase.FindOverviewByDate(core.FileDate(p.Date))
+	overviews, err := d.overviewUsecase.FindOverviewByDate(core.Date(p.Date))
 
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
@@ -55,12 +55,7 @@ func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	from := core.FileDate(p.From)
-	to := core.FileDate(p.To)
-	_, err = from.Validate()
-	_, err = to.Validate()
-
-	term := core.NewTerm(from, to)
+	term := core.NewTerm(core.Date(p.From), core.Date(p.To))
 
 	overviews, err := d.overviewUsecase.FindOverviewByTerm(term)
 

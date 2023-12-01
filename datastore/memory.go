@@ -1,7 +1,7 @@
 package datastore
 
 type Memory struct {
-	db map[string]interface{}
+	db map[string]map[string]interface{}
 }
 
 func (m *Memory) FindByKey(table, key string) ([]byte, error) {
@@ -29,12 +29,12 @@ func NewMemory() *Memory {
 }
 
 func (m *Memory) Open() error {
-	m.db = make(map[string]interface{})
+	m.db = make(map[string]map[string]interface{})
 	return nil
 }
 
 func (m *Memory) Close() error {
-	m.db = make(map[string]interface{})
+	m.db = make(map[string]map[string]interface{})
 	return nil
 }
 
