@@ -37,13 +37,13 @@ func (d *Documents) GetDocumentsByDate(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 
-	res := make([]edinet.DocumentListResponse, 0, len(overviews))
+	res := make([]edinet.EdinetDocumentResponse, 0, len(overviews))
 	for idx, overview := range overviews {
 		res[idx] = *overview
 	}
 
-	return ctx.JSON(edinet.DocumentListResponses{
-		List: res,
+	return ctx.JSON(edinet.EdinetResponses{
+		Items: res,
 	})
 }
 
@@ -57,7 +57,7 @@ func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
 
 	term := core.NewTerm(core.Date(p.From), core.Date(p.To))
 
-	overviews, err := d.overviewUsecase.FindOverviewByTerm(term)
+	overviews, err := d.overviewUsecase.FindOverviewByTerm(term, p.Refresh)
 
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
@@ -66,13 +66,13 @@ func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
 		})
 	}
 
-	res := make([]edinet.DocumentListResponse, len(overviews))
+	res := make([]edinet.EdinetDocumentResponse, len(overviews))
 	for idx, overview := range overviews {
 		res[idx] = *overview
 	}
 
-	return ctx.JSON(edinet.DocumentListResponses{
-		List: res,
+	return ctx.JSON(edinet.EdinetResponses{
+		Items: res,
 	})
 }
 
@@ -107,6 +107,7 @@ type FileDateParam struct {
 }
 
 type FileTermParams struct {
-	From string `query:"from"`
-	To   string `query:"to"`
+	From    string `query:"from"`
+	To      string `query:"to"`
+	Refresh bool   `query:"refresh"`
 }

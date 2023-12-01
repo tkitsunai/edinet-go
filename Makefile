@@ -2,7 +2,7 @@
 PACKAGE_DIR=edinet
 
 gen:
-	schematyper --package=edinet -o $(PACKAGE_DIR)/gen_document_list.go gen/DocumentListResponse.json
+	schematyper --package=edinet --root-type=EdinetDocumentResponse -o $(PACKAGE_DIR)/gen_edinet_response.go gen/edinet_response.json
 
 init:
 	cp -af .edinet-apikey.yml.example .edinet-apikey.yml

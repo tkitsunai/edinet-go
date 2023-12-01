@@ -68,10 +68,9 @@ func (f *File) NameWithExtension() string {
 	return f.Name + f.Extension
 }
 
-// DocumentContentResponses
-// must be generated struct "DocumentListResponse"
-// gen_document_list.go
-type DocumentContentResponses []*DocumentListResponse
-type DocumentListResponses struct {
-	List []DocumentListResponse `json:"items"`
+// EdinetResponses
+// must be generated struct "EdinetDocumentResponse"
+// gen_edinet_response.go
+type EdinetResponses struct {
+	Items []EdinetDocumentResponse `json:"items"`
 }

@@ -21,16 +21,16 @@ func NewOverview(i *do.Injector) (*Overview, error) {
 	}, nil
 }
 
-func (t *Overview) FindOverviewByDate(date core.Date) ([]*edinet.DocumentListResponse, error) {
-	var results []*edinet.DocumentListResponse
+func (t *Overview) FindOverviewByDate(date core.Date) ([]*edinet.EdinetDocumentResponse, error) {
+	var results []*edinet.EdinetDocumentResponse
 	doc, err := t.ovPort.Get(date)
 	results = append(results, doc)
 	return results, err
 }
 
-func (t *Overview) FindOverviewByTerm(term core.Term) ([]*edinet.DocumentListResponse, error) {
+func (t *Overview) FindOverviewByTerm(term core.Term, refresh bool) ([]*edinet.EdinetDocumentResponse, error) {
 	dateRange := term.GetDateRange()
-	var results []*edinet.DocumentListResponse
+	var results []*edinet.EdinetDocumentResponse
 	var mu = sync.Mutex{}
 	var meg multierror.Group
 
@@ -40,10 +40,13 @@ func (t *Overview) FindOverviewByTerm(term core.Term) ([]*edinet.DocumentListRes
 			defer mu.Unlock()
 			meg.Go(func() error {
 				// data store exists, using stored data.
-				if store, err := t.ovPort.GetByStore(date); err == nil {
-					logger.Logger.Info().Msgf("find stored data. %s", date)
-					results = append(results, store)
-					return nil
+				// If refresh mode is on, the data is not retrieved from the data store.
+				if !refresh {
+					if store, err := t.ovPort.GetByStore(date); err == nil {
+						logger.Logger.Info().Msgf("find stored data. %s", date)
+						results = append(results, store)
+						return nil
+					}
 				}
 
 				res, err := t.ovPort.Get(date)

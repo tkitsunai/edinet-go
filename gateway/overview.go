@@ -25,8 +25,8 @@ func NewOverview(i *do.Injector) (port.Overview, error) {
 	}, nil
 }
 
-func (o *Overview) GetByStore(date core.Date) (*edinet.DocumentListResponse, error) {
-	res := edinet.DocumentListResponse{
+func (o *Overview) GetByStore(date core.Date) (*edinet.EdinetDocumentResponse, error) {
+	res := edinet.EdinetDocumentResponse{
 		Metadata: edinet.Metadata{},
 		Results:  make([]edinet.Result, 0),
 	}
@@ -71,7 +71,7 @@ func decode[T edinet.Result | edinet.Metadata](data []byte) (T, error) {
 	return result, nil
 }
 
-func (o *Overview) Get(date core.Date) (*edinet.DocumentListResponse, error) {
+func (o *Overview) Get(date core.Date) (*edinet.EdinetDocumentResponse, error) {
 	// data persistent from edinet-data
 	results, err := o.c.RequestDocumentList(date)
 	if err != nil {

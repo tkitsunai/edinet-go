@@ -48,7 +48,7 @@ func (c *Client) URL() *url.URL {
 	return &baseUrl
 }
 
-func (c *Client) RequestDocumentList(date core.Date) (*DocumentListResponse, error) {
+func (c *Client) RequestDocumentList(date core.Date) (*EdinetDocumentResponse, error) {
 	u := c.URL()
 	u.Path = path.Join(u.Path, "documents.json")
 	q := u.Query()
@@ -58,7 +58,7 @@ func (c *Client) RequestDocumentList(date core.Date) (*DocumentListResponse, err
 	u.RawQuery = q.Encode()
 
 	ctx := context.Background()
-	res := DocumentListResponse{}
+	res := EdinetDocumentResponse{}
 	statusCode, err := c.httpClient.ExecuteGetWithDecodeJson(ctx, u, &res)
 	if err != nil {
 		return nil, err
