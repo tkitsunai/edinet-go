@@ -23,30 +23,6 @@ func NewDocumentsResource(
 	}
 }
 
-func (d *Documents) GetDocumentsByDate(ctx *fiber.Ctx) error {
-	p := FileDateParam{}
-	err := ctx.ParamsParser(&p)
-
-	if err != nil {
-		return err
-	}
-
-	overviews, err := d.overviewUsecase.FindOverviewByDate(core.Date(p.Date))
-
-	if err != nil {
-		return ctx.Status(http.StatusInternalServerError).SendString(err.Error())
-	}
-
-	res := make([]edinet.EdinetDocumentResponse, 0, len(overviews))
-	for idx, overview := range overviews {
-		res[idx] = *overview
-	}
-
-	return ctx.JSON(edinet.EdinetResponses{
-		Items: res,
-	})
-}
-
 func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
 	p := FileTermParams{}
 	err := ctx.QueryParser(&p)
@@ -68,7 +44,7 @@ func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
 
 	res := make([]edinet.EdinetDocumentResponse, len(overviews))
 	for idx, overview := range overviews {
-		res[idx] = *overview
+		res[idx] = overview
 	}
 
 	return ctx.JSON(edinet.EdinetResponses{

@@ -57,14 +57,14 @@ type DocumentListRequestParameter struct {
 	Type     RequestType
 }
 
-type File struct {
+type DocumentFile struct {
 	Name       string
 	Extension  string
 	DocumentId DocumentId
 	Content    []byte
 }
 
-func (f *File) NameWithExtension() string {
+func (f *DocumentFile) NameWithExtension() string {
 	return f.Name + f.Extension
 }
 

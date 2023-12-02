@@ -25,22 +25,16 @@ func NewOverview(i *do.Injector) (port.Overview, error) {
 	}, nil
 }
 
-func (o *Overview) GetByStore(date core.Date) (*edinet.EdinetDocumentResponse, error) {
-	res := edinet.EdinetDocumentResponse{
-		Metadata: edinet.Metadata{},
-		Results:  make([]edinet.Result, 0),
-	}
-
+func (o *Overview) GetByStore(date core.Date) (edinet.EdinetDocumentResponse, error) {
 	// メタデータの取得
 	findMetaData, err := o.db.FindByKey("metadata", date.String())
 	if err != nil {
-		return nil, err
+		return edinet.EdinetDocumentResponse{}, err
 	}
 	decodedMetaData, err := decode[edinet.Metadata](findMetaData)
 	if err != nil {
-		return nil, err
+		return edinet.EdinetDocumentResponse{}, err
 	}
-	res.Metadata = decodedMetaData
 
 	// 日付データの取得
 	foundResults, err := o.db.FindAll(date.String())
@@ -50,14 +44,15 @@ func (o *Overview) GetByStore(date core.Date) (*edinet.EdinetDocumentResponse, e
 		// decode results
 		decodedResult, err := decode[edinet.Result](result)
 		if err != nil {
-			return nil, err
+			return edinet.EdinetDocumentResponse{}, err
 		}
 		results[i] = decodedResult
 	}
 
-	res.Results = results
-
-	return &res, nil
+	return edinet.EdinetDocumentResponse{
+		Metadata: decodedMetaData,
+		Results:  results,
+	}, nil
 }
 
 func decode[T edinet.Result | edinet.Metadata](data []byte) (T, error) {
@@ -71,11 +66,11 @@ func decode[T edinet.Result | edinet.Metadata](data []byte) (T, error) {
 	return result, nil
 }
 
-func (o *Overview) Get(date core.Date) (*edinet.EdinetDocumentResponse, error) {
+func (o *Overview) Get(date core.Date) (edinet.EdinetDocumentResponse, error) {
 	// data persistent from edinet-data
 	results, err := o.c.RequestDocumentList(date)
 	if err != nil {
-		return nil, err
+		return edinet.EdinetDocumentResponse{}, err
 	}
 
 	// all data saving

@@ -48,7 +48,7 @@ func (c *Client) URL() *url.URL {
 	return &baseUrl
 }
 
-func (c *Client) RequestDocumentList(date core.Date) (*EdinetDocumentResponse, error) {
+func (c *Client) RequestDocumentList(date core.Date) (EdinetDocumentResponse, error) {
 	u := c.URL()
 	u.Path = path.Join(u.Path, "documents.json")
 	q := u.Query()
@@ -61,16 +61,16 @@ func (c *Client) RequestDocumentList(date core.Date) (*EdinetDocumentResponse, e
 	res := EdinetDocumentResponse{}
 	statusCode, err := c.httpClient.ExecuteGetWithDecodeJson(ctx, u, &res)
 	if err != nil {
-		return nil, err
+		return EdinetDocumentResponse{}, err
 	}
 	if !isSuccessful(statusCode) {
 		log.Println("[warning] EDINET-API status code:", statusCode)
-		return nil, apiError
+		return EdinetDocumentResponse{}, apiError
 	}
-	return &res, nil
+	return res, nil
 }
 
-func (c *Client) RequestDocument(docId DocumentId, fileType FileType) (File, error) {
+func (c *Client) RequestDocument(docId DocumentId, fileType FileType) (DocumentFile, error) {
 	u := c.URL()
 	u.Path = path.Join(u.Path, "documents", docId.String())
 	q := u.Query()
@@ -82,7 +82,7 @@ func (c *Client) RequestDocument(docId DocumentId, fileType FileType) (File, err
 	req, _ := c.httpClient.NewRequest(ctx, "GET", u, "", nil)
 	response, err := c.httpClient.client.Do(req)
 	if err != nil {
-		return File{}, err
+		return DocumentFile{}, err
 	}
 
 	if isSuccessful(response.StatusCode) {
@@ -96,16 +96,16 @@ func (c *Client) RequestDocument(docId DocumentId, fileType FileType) (File, err
 		case "application/pdf":
 			extension = ".pdf"
 		case "application/json; charset=utf-8":
-			return File{}, fmt.Errorf("document not found: %s", docId.String())
+			return DocumentFile{}, fmt.Errorf("document not found: %s", docId.String())
 		}
 		// read binary
 		defer response.Body.Close()
 		content, err := io.ReadAll(response.Body)
 		if err != nil {
-			return File{}, nil
+			return DocumentFile{}, nil
 		}
 
-		res := File{
+		res := DocumentFile{
 			Name:       docId.String(),
 			Extension:  extension,
 			DocumentId: docId,
@@ -114,5 +114,5 @@ func (c *Client) RequestDocument(docId DocumentId, fileType FileType) (File, err
 		return res, nil
 	}
 
-	return File{}, nil
+	return DocumentFile{}, nil
 }

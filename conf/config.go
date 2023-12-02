@@ -24,7 +24,8 @@ func init() {
 
 func readConfig() {
 	v := viper.New()
-	v.SetConfigFile(".edinet-apikey.yml")
+	v.SetConfigName(".edinet-apikey")
+	v.SetConfigType("yml")
 	usr, err := user.Current()
 	if err != nil {
 		fmt.Println("Error getting user information:", err)
@@ -49,7 +50,8 @@ func readConfig() {
 
 func readServerConfig() {
 	v := viper.New()
-	v.SetConfigFile(".edinet-go.yml")
+	v.SetConfigName(".edinet-go")
+	v.SetConfigType("yml")
 
 	usr, err := user.Current()
 	if err != nil {

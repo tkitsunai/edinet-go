@@ -15,6 +15,6 @@ func NewDocument(i *do.Injector) (port.Document, error) {
 	return &Document{c: client}, nil
 }
 
-func (d *Document) Get(id edinet.DocumentId, fileType edinet.FileType) (edinet.File, error) {
+func (d *Document) Get(id edinet.DocumentId, fileType edinet.FileType) (edinet.DocumentFile, error) {
 	return d.c.RequestDocument(id, fileType)
 }

@@ -21,21 +21,15 @@ func NewOverview(i *do.Injector) (*Overview, error) {
 	}, nil
 }
 
-func (t *Overview) FindOverviewByDate(date core.Date) ([]*edinet.EdinetDocumentResponse, error) {
-	var results []*edinet.EdinetDocumentResponse
-	doc, err := t.ovPort.Get(date)
-	results = append(results, doc)
-	return results, err
-}
-
-func (t *Overview) FindOverviewByTerm(term core.Term, refresh bool) ([]*edinet.EdinetDocumentResponse, error) {
+func (t *Overview) FindOverviewByTerm(term core.Term, refresh bool) ([]edinet.EdinetDocumentResponse, error) {
 	dateRange := term.GetDateRange()
-	var results []*edinet.EdinetDocumentResponse
+	//var results []edinet.EdinetDocumentResponse
 	var mu = sync.Mutex{}
 	var meg multierror.Group
 
-	for _, date := range dateRange {
-		runAsync := func(date core.Date) {
+	results := make([]edinet.EdinetDocumentResponse, len(dateRange))
+	for i, date := range dateRange {
+		runAsync := func(idx int, date core.Date) {
 			mu.Lock()
 			defer mu.Unlock()
 			meg.Go(func() error {
@@ -44,7 +38,7 @@ func (t *Overview) FindOverviewByTerm(term core.Term, refresh bool) ([]*edinet.E
 				if !refresh {
 					if store, err := t.ovPort.GetByStore(date); err == nil {
 						logger.Logger.Info().Msgf("find stored data. %s", date)
-						results = append(results, store)
+						results[idx] = store
 						return nil
 					}
 				}
@@ -53,18 +47,15 @@ func (t *Overview) FindOverviewByTerm(term core.Term, refresh bool) ([]*edinet.E
 				if err != nil {
 					return err
 				}
-				results = append(results, res)
+				results[idx] = res
 				return nil
 			})
 		}
-		runAsync(date)
+		runAsync(i, date)
 	}
 	waitedError := meg.Wait()
-
-	var err error
-
 	if waitedError != nil {
-		err = waitedError.ErrorOrNil()
+		return nil, waitedError.ErrorOrNil()
 	}
 
 	logger.Logger.Info().Msgf("Day Size: %d", len(dateRange))
@@ -74,5 +65,5 @@ func (t *Overview) FindOverviewByTerm(term core.Term, refresh bool) ([]*edinet.E
 		logger.Logger.Info().Msgf("Day: %s Document Results Size: %d", data.Metadata.Parameter.Date, len(data.Results))
 	}
 
-	return results, err
+	return results, nil
 }

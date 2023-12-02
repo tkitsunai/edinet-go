@@ -6,6 +6,6 @@ import (
 )
 
 type Overview interface {
-	Get(date core.Date) (*edinet.EdinetDocumentResponse, error)
-	GetByStore(date core.Date) (*edinet.EdinetDocumentResponse, error)
+	Get(date core.Date) (edinet.EdinetDocumentResponse, error)
+	GetByStore(date core.Date) (edinet.EdinetDocumentResponse, error)
 }
