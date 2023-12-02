@@ -12,7 +12,12 @@ var (
 	config       Config
 	serverConfig ServerConfig
 
-	once sync.Once
+	once                sync.Once
+	defaultConfig       = Config{ApiKey: "none"}
+	defaultServerConfig = ServerConfig{
+		Port:       "3000",
+		Persistent: Persistent{},
+	}
 )
 
 func init() {
@@ -38,8 +43,9 @@ func readConfig() {
 
 	err = v.ReadInConfig()
 	if err != nil {
-		fmt.Println(err)
-		panic("config file not found")
+		fmt.Println("config file not found", err)
+		config = defaultConfig
+		return
 	}
 
 	err = v.Unmarshal(&config)
@@ -66,8 +72,9 @@ func readServerConfig() {
 
 	err = v.ReadInConfig()
 	if err != nil {
-		fmt.Println(err)
-		panic("config file not found")
+		fmt.Println("config file not found", err)
+		config = defaultConfig
+		return
 	}
 
 	err = v.Unmarshal(&serverConfig)
