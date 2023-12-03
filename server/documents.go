@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/samber/do"
 	"github.com/tkitsunai/edinet-go/core"
 	"github.com/tkitsunai/edinet-go/edinet"
 	"github.com/tkitsunai/edinet-go/usecase"
@@ -13,14 +14,16 @@ type Documents struct {
 	documentUsecase *usecase.Document
 }
 
-func NewDocumentsResource(
-	overview *usecase.Overview,
-	docUsecase *usecase.Document,
-) *Documents {
+func NewDocuments(
+	i *do.Injector,
+) (*Documents, error) {
+	overview := do.MustInvoke[*usecase.Overview](i)
+	docUsecase := do.MustInvoke[*usecase.Document](i)
+
 	return &Documents{
 		overviewUsecase: overview,
 		documentUsecase: docUsecase,
-	}
+	}, nil
 }
 
 func (d *Documents) StoreDocumentsByTerm(ctx *fiber.Ctx) error {

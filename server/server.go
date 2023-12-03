@@ -6,7 +6,6 @@ import (
 	"github.com/samber/do"
 	"github.com/tkitsunai/edinet-go/conf"
 	"github.com/tkitsunai/edinet-go/datastore"
-	"github.com/tkitsunai/edinet-go/usecase"
 	"net"
 )
 
@@ -32,15 +31,14 @@ func NewServer(storeEngine datastore.Engine, injector *do.Injector) *Server {
 }
 
 func (s *Server) setHandlers() {
-	overview := do.MustInvoke[*usecase.Overview](s.i)
-	document := do.MustInvoke[*usecase.Document](s.i)
-	docResources := NewDocumentsResource(overview, document)
+	docResources := do.MustInvoke[*Documents](s.i)
 	companyResoures := do.MustInvoke[*Company](s.i)
 
 	s.app.Get("/documents", docResources.GetDocumentsByTerm)
 	s.app.Post("/documents", docResources.StoreDocumentsByTerm)
 	s.app.Get("/documents/:id", docResources.GetDocument)
 	s.app.Get("/companies", companyResoures.FindCompanies)
+	s.app.Get("/companies/:id", companyResoures.FindCompany)
 }
 
 func (s *Server) Run() error {

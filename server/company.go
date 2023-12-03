@@ -1,8 +1,10 @@
 package server
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/samber/do"
+	"github.com/tkitsunai/edinet-go/core"
 	"github.com/tkitsunai/edinet-go/usecase"
 	"net/http"
 )
@@ -14,6 +16,25 @@ type Company struct {
 func NewCompany(i *do.Injector) (*Company, error) {
 	companyUsecase := do.MustInvoke[*usecase.Company](i)
 	return &Company{companyUsecase: companyUsecase}, nil
+}
+
+func (c *Company) FindCompany(ctx *fiber.Ctx) error {
+	companyId := ctx.Params("id")
+
+	id := core.EdinetCode(companyId)
+	foundCompany, err := c.companyUsecase.FindById(id)
+
+	if err != nil {
+		return ctx.Status(http.StatusNotFound).JSON(fiber.Map{
+			"status":  http.StatusNotFound,
+			"message": fmt.Sprintf("company not found ID:%s", companyId),
+		})
+	}
+
+	return ctx.Status(http.StatusOK).JSON(CompanyJson{
+		EdinetCode: foundCompany.ECode.String(),
+		Name:       foundCompany.Name.String(),
+	})
 }
 
 func (c *Company) FindCompanies(ctx *fiber.Ctx) error {

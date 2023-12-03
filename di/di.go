@@ -27,6 +27,7 @@ func SetUpContainer(storeDriver datastore.Driver) *do.Injector {
 	do.Provide(injector, usecase.NewDocument)
 	do.Provide(injector, usecase.NewCompany)
 
+	do.Provide(injector, server.NewDocuments)
 	do.Provide(injector, server.NewCompany)
 
 	return injector
