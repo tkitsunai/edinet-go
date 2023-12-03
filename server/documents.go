@@ -23,8 +23,26 @@ func NewDocumentsResource(
 	}
 }
 
+func (d *Documents) StoreDocumentsByTerm(ctx *fiber.Ctx) error {
+	p := TermParams{}
+	err := ctx.QueryParser(&p)
+	if err != nil {
+		return err
+	}
+
+	term := core.NewTerm(core.Date(p.From), core.Date(p.To))
+
+	err = d.overviewUsecase.StoreByTerm(term)
+	if err != nil {
+		return err
+	}
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"status": "ok",
+	})
+}
+
 func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
-	p := FileTermParams{}
+	p := TermParams{}
 	err := ctx.QueryParser(&p)
 
 	if err != nil {
@@ -82,7 +100,7 @@ type FileDateParam struct {
 	Date string
 }
 
-type FileTermParams struct {
+type TermParams struct {
 	From    string `query:"from"`
 	To      string `query:"to"`
 	Refresh bool   `query:"refresh"`

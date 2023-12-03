@@ -48,6 +48,7 @@ func TestOverview_FindOverviewByTerm(t *testing.T) {
 	mockOverview.On("Get", mock.Anything).Return(createEdinetResponse(), nil)
 
 	do.ProvideValue[port.Overview](in, mockOverview)
+	do.ProvideValue[port.Company](in, nil)
 	target, _ := usecase.NewOverview(in)
 
 	cases := map[string]struct {

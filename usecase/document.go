@@ -17,10 +17,14 @@ func NewDocument(i *do.Injector) (*Document, error) {
 	}, nil
 }
 
-func (c *Document) FindContent(id edinet.DocumentId, fileType edinet.FileType) (edinet.DocumentFile, error) {
-	document, err := c.docPort.Get(id, fileType)
+func (d *Document) FindContent(id edinet.DocumentId, fileType edinet.FileType) (edinet.DocumentFile, error) {
+	document, err := d.docPort.Get(id, fileType)
 	if err != nil {
 		return edinet.DocumentFile{}, err
 	}
 	return document, nil
+}
+
+func (d *Document) FindAllDocs() ([]edinet.DocumentFile, error) {
+	panic("todo")
 }

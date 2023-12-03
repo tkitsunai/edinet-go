@@ -13,9 +13,10 @@ import (
 	"time"
 )
 
-// KVS設計
-// 日付単位のBucket
-// 各日付に紐づくデータを保存
+const (
+	MetaDataTable = "metadata"
+	CompanyTable  = "company"
+)
 
 type BoltDB struct {
 	db *bolt.DB

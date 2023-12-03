@@ -1,8 +1,6 @@
 package gateway
 
 import (
-	"bytes"
-	"encoding/gob"
 	"github.com/samber/do"
 	"github.com/tkitsunai/edinet-go/core"
 	"github.com/tkitsunai/edinet-go/datastore"
@@ -27,7 +25,7 @@ func NewOverview(i *do.Injector) (port.Overview, error) {
 
 func (o *Overview) GetByStore(date core.Date) (edinet.EdinetDocumentResponse, error) {
 	// メタデータの取得
-	findMetaData, err := o.db.FindByKey("metadata", date.String())
+	findMetaData, err := o.db.FindByKey(datastore.MetaDataTable, date.String())
 	if err != nil {
 		return edinet.EdinetDocumentResponse{}, err
 	}
@@ -55,17 +53,6 @@ func (o *Overview) GetByStore(date core.Date) (edinet.EdinetDocumentResponse, er
 	}, nil
 }
 
-func decode[T edinet.Result | edinet.Metadata](data []byte) (T, error) {
-	var emp T
-	var result T
-	decoder := gob.NewDecoder(bytes.NewReader(data))
-	err := decoder.Decode(&result)
-	if err != nil {
-		return emp, err
-	}
-	return result, nil
-}
-
 func (o *Overview) Get(date core.Date) (edinet.EdinetDocumentResponse, error) {
 	// data persistent from edinet-data
 	results, err := o.c.RequestDocumentList(date)
@@ -80,7 +67,7 @@ func (o *Overview) Get(date core.Date) (edinet.EdinetDocumentResponse, error) {
 	}
 
 	storeErr := o.db.Batch(results.Metadata.Parameter.Date, batchingData)
-	err = o.db.Update("metadata", results.Metadata.Parameter.Date, results.Metadata)
+	err = o.db.Update(datastore.MetaDataTable, results.Metadata.Parameter.Date, results.Metadata)
 	if err != nil {
 		// if failed save error
 		// TODO requires consideration
