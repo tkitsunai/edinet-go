@@ -2,6 +2,7 @@ package di
 
 import (
 	"github.com/samber/do"
+	"github.com/tkitsunai/edinet-go/adapter"
 	"github.com/tkitsunai/edinet-go/conf"
 	"github.com/tkitsunai/edinet-go/datastore"
 	"github.com/tkitsunai/edinet-go/edinet"
@@ -15,18 +16,25 @@ func SetUpContainer(storeDriver datastore.Driver) *do.Injector {
 
 	config := conf.LoadConfig()
 
+	// other
 	do.ProvideValue(injector, config)
-	do.ProvideValue[datastore.Driver](injector, storeDriver)
+	do.ProvideValue(injector, storeDriver)
 	do.Provide(injector, edinet.NewClient)
 
+	// gateways
 	do.Provide(injector, gateway.NewDocument)
 	do.Provide(injector, gateway.NewCompany)
 	do.Provide(injector, gateway.NewOverview)
 
+	// adapters
+	do.Provide(injector, adapter.NewCompanyConverter)
+
+	// usecase
 	do.Provide(injector, usecase.NewOverview)
 	do.Provide(injector, usecase.NewDocument)
 	do.Provide(injector, usecase.NewCompany)
 
+	// handler resources
 	do.Provide(injector, server.NewDocuments)
 	do.Provide(injector, server.NewCompany)
 

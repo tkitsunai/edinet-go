@@ -49,6 +49,7 @@ func TestOverview_FindOverviewByTerm(t *testing.T) {
 
 	do.ProvideValue[port.Overview](in, mockOverview)
 	do.ProvideValue[port.Company](in, nil)
+	do.ProvideValue[port.CompanyConverter](in, nil)
 	target, _ := usecase.NewOverview(in)
 
 	cases := map[string]struct {

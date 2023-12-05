@@ -32,7 +32,7 @@ func (c *Company) FindCompany(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(http.StatusOK).JSON(CompanyJson{
-		EdinetCode: foundCompany.ECode.String(),
+		EdinetCode: foundCompany.EdinetCode.String(),
 		Name:       foundCompany.Name.String(),
 	})
 }
@@ -54,9 +54,14 @@ func (c *Company) FindCompanies(ctx *fiber.Ctx) error {
 
 	results := make([]CompanyJson, len(companies))
 	for i, company := range companies {
+		ids := make([]string, 0, len(company.Docs))
+		for _, v := range company.Docs {
+			ids = append(ids, v.Id.String())
+		}
 		s := CompanyJson{
-			company.ECode.String(),
-			company.Name.String(),
+			EdinetCode:  company.EdinetCode.String(),
+			Name:        company.Name.String(),
+			DocumentIds: ids,
 		}
 		results[i] = s
 	}
@@ -69,6 +74,7 @@ func (c *Company) FindCompanies(ctx *fiber.Ctx) error {
 }
 
 type CompanyJson struct {
-	EdinetCode string `json:"edinetCode"`
-	Name       string `json:"name"`
+	EdinetCode  string   `json:"edinetCode"`
+	Name        string   `json:"name"`
+	DocumentIds []string `json:"documentIds"`
 }

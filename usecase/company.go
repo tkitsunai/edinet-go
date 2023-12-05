@@ -10,8 +10,8 @@ type Company struct {
 	companyPort port.Company
 }
 
-func NewCompany(injector *do.Injector) (*Company, error) {
-	companyPort := do.MustInvoke[port.Company](injector)
+func NewCompany(i *do.Injector) (*Company, error) {
+	companyPort := do.MustInvoke[port.Company](i)
 	return &Company{companyPort: companyPort}, nil
 }
 

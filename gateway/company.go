@@ -47,7 +47,7 @@ func (c *Company) Find() (core.Companies, error) {
 func (c *Company) Store(company core.Company) error {
 	// TODO データが見つかった場合
 	{
-		foundData, err := c.db.FindByKey(datastore.CompanyTable, company.ECode.String())
+		foundData, err := c.db.FindByKey(datastore.CompanyTable, company.EdinetCode.String())
 		if err != nil {
 			// nodata
 		}
@@ -58,17 +58,17 @@ func (c *Company) Store(company core.Company) error {
 		}
 	}
 	// データ投入
-	return c.db.Update(datastore.CompanyTable, company.ECode.String(), company)
+	return c.db.Update(datastore.CompanyTable, company.EdinetCode.String(), company)
 }
 
 func (c *Company) StoreAll(companies core.Companies) error {
 	storeData := make(map[string]interface{})
 
 	for _, company := range companies {
-		if company.ECode.String() == "" {
+		if company.EdinetCode.String() == "" {
 			continue
 		}
-		storeData[company.ECode.String()] = company
+		storeData[company.EdinetCode.String()] = company
 	}
 
 	return c.db.Batch(datastore.CompanyTable, storeData)

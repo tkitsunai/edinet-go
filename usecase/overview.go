@@ -13,21 +13,26 @@ import (
 type Overview struct {
 	ovPort      port.Overview
 	companyPort port.Company
+	ccPort      port.CompanyConverter
 }
 
 func NewOverview(i *do.Injector) (*Overview, error) {
 	ovPort := do.MustInvoke[port.Overview](i)
 	companyPort := do.MustInvoke[port.Company](i)
+	ccPort := do.MustInvoke[port.CompanyConverter](i)
+
 	return &Overview{
 		ovPort:      ovPort,
 		companyPort: companyPort,
+		ccPort:      ccPort,
 	}, nil
 }
 
 func (o *Overview) StoreByTerm(term core.Term) error {
 	dateRange := term.GetDateRange()
 	var mutex sync.Mutex
-	uniqueCompanies := make(map[string]core.Company)
+
+	responses := make([]edinet.EdinetDocumentResponse, len(dateRange))
 	wg := sync.WaitGroup{}
 	for _, date := range dateRange {
 		wg.Add(1)
@@ -36,32 +41,28 @@ func (o *Overview) StoreByTerm(term core.Term) error {
 			mutex.Lock()
 			defer mutex.Unlock()
 
-			get, err := o.ovPort.Get(date)
+			gr, err := o.ovPort.Get(date)
+			responses = append(responses, gr)
 			if err != nil {
 				return err
-			}
-			for _, result := range get.Results {
-				company := core.Company{
-					ECode: core.EdinetCode(result.EdinetCode),
-					Name:  core.CompanyName(result.FilerName),
-				}
-				uniqueCompanies[company.ECode.String()] = company
 			}
 			return nil
 		}(date)
 	}
 	wg.Wait()
 
-	// company store
-	companies := make(core.Companies, 0, len(uniqueCompanies))
-	for _, company := range uniqueCompanies {
-		companies = append(companies, company)
+	// 複数の日付にまたがって存在する企業データの投入
+	for _, resultsSet := range responses {
+		results := resultsSet.Results
+		companies, _ := o.ccPort.UniqueCompanies(results)
+		err := o.companyPort.StoreAll(companies)
+		logger.Logger.Info().Msgf("stored companies data : %d", len(companies))
+		if err != nil {
+			return err
+		}
 	}
-	err := o.companyPort.StoreAll(companies)
 
-	logger.Logger.Info().Msgf("stored companies data : %d", len(companies))
-
-	return err
+	return nil
 }
 
 func (o *Overview) FindOverviewByTerm(term core.Term, refresh bool) ([]edinet.EdinetDocumentResponse, error) {

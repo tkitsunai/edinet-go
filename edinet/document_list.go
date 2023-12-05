@@ -35,7 +35,14 @@ const (
 	AlternativeDoc
 	EnglishDoc
 	CSV
+	ALL
 )
+
+func AllFileType() []FileType {
+	return []FileType{
+		XBRL, PDF, AlternativeDoc, EnglishDoc, CSV,
+	}
+}
 
 func NewFileTypeByName(name string) FileType {
 	if len(name) == 0 {
@@ -48,6 +55,8 @@ func NewFileTypeByName(name string) FileType {
 		return PDF
 	case "CSV":
 		return CSV
+	case "ALL":
+		return ALL
 	}
 	return Unknown
 }

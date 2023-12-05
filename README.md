@@ -28,6 +28,16 @@ make setup
 make run
 ```
 
+## Test
+
+```bash
+make test
+```
+
+## Contribution
+
+Fork ➜ Create branch ➜ Commit ➜ Push ➜ Pull Requests
+
 ## License
 
 edinet-go is licensed under the [Apache License 2.0](LICENSE).

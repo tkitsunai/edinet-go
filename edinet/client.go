@@ -88,7 +88,6 @@ func (c *Client) RequestDocument(docId DocumentId, fileType FileType) (DocumentF
 	if isSuccessful(response.StatusCode) {
 		// response content-type check
 		contentType := response.Header.Get("Content-Type")
-		fmt.Println(contentType)
 		var extension string
 		switch contentType {
 		case "application/octet-stream":
