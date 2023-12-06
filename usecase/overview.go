@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"github.com/hashicorp/go-multierror"
 	"github.com/samber/do"
 	"github.com/tkitsunai/edinet-go/core"
@@ -28,6 +29,15 @@ func NewOverview(i *do.Injector) (*Overview, error) {
 	}, nil
 }
 
+func (o *Overview) FindByDateAndType(date core.Date, typ edinet.RequestType) (edinet.EdinetDocumentResponse, error) {
+	switch typ {
+	case edinet.MetaDataAndDocuments, edinet.MetaDataOnly:
+		return o.ovPort.GetRaw(date, typ)
+	default:
+		return edinet.EdinetDocumentResponse{}, fmt.Errorf("request type not match")
+	}
+}
+
 func (o *Overview) StoreByTerm(term core.Term) error {
 	dateRange := term.GetDateRange()
 	var mutex sync.Mutex
@@ -51,15 +61,22 @@ func (o *Overview) StoreByTerm(term core.Term) error {
 	}
 	wg.Wait()
 
-	// 複数の日付にまたがって存在する企業データの投入
+	// 複数の日付にまたがって存在する企業データ
+	totalSize := 0
 	for _, resultsSet := range responses {
-		results := resultsSet.Results
-		companies, _ := o.ccPort.UniqueCompanies(results)
-		err := o.companyPort.StoreAll(companies)
-		logger.Logger.Info().Msgf("stored companies data : %d", len(companies))
-		if err != nil {
-			return err
-		}
+		totalSize += len(resultsSet.Results)
+	}
+	joinResults := make([]edinet.Result, 0, totalSize)
+	for _, resultsSet := range responses {
+		joinResults = append(joinResults, resultsSet.Results...)
+	}
+	companies, err := o.ccPort.UniqueCompanies(joinResults)
+	if err != nil {
+		return err
+	}
+	err = o.companyPort.StoreAll(companies)
+	if err != nil {
+		return err
 	}
 
 	return nil

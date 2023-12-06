@@ -37,6 +37,8 @@ func SetUpContainer(storeDriver datastore.Driver) *do.Injector {
 	// handler resources
 	do.Provide(injector, server.NewDocuments)
 	do.Provide(injector, server.NewCompany)
+	do.Provide(injector, server.NewEdinetRaw)
+	do.Provide(injector, server.NewAdminResources)
 
 	return injector
 }

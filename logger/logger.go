@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog"
 	"os"
 	"sync"
@@ -21,4 +22,11 @@ func init() {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		Logger = zerolog.New(output).With().Timestamp().Caller().Logger()
 	})
+}
+
+func RequestLogging() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		Logger.Info().Str("method", c.Method()).Str("path", c.Path()).Msg("Request received")
+		return c.Next()
+	}
 }

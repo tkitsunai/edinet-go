@@ -1,7 +1,10 @@
 package port
 
-import "github.com/tkitsunai/edinet-go/edinet"
+import (
+	"github.com/tkitsunai/edinet-go/core"
+	"github.com/tkitsunai/edinet-go/edinet"
+)
 
 type Document interface {
-	Get(id edinet.DocumentId, fileType edinet.FileType) (edinet.DocumentFile, error)
+	Get(id core.DocumentId, fileType edinet.FileType) (edinet.DocumentFile, error)
 }

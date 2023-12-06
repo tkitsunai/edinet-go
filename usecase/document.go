@@ -5,7 +5,9 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/samber/do"
+	"github.com/tkitsunai/edinet-go/core"
 	"github.com/tkitsunai/edinet-go/edinet"
+	"github.com/tkitsunai/edinet-go/logger"
 	"github.com/tkitsunai/edinet-go/port"
 )
 
@@ -20,7 +22,7 @@ func NewDocument(i *do.Injector) (*Document, error) {
 	}, nil
 }
 
-func (d *Document) FindContent(id edinet.DocumentId, fileType edinet.FileType) (edinet.DocumentFile, error) {
+func (d *Document) FindContent(id core.DocumentId, fileType edinet.FileType) (edinet.DocumentFile, error) {
 	// 全ファイルを取得
 	if fileType == edinet.ALL {
 		var allFiles []edinet.DocumentFile
@@ -28,8 +30,13 @@ func (d *Document) FindContent(id edinet.DocumentId, fileType edinet.FileType) (
 		for _, ft := range fts {
 			doc, err := d.docPort.Get(id, ft)
 			if err != nil {
+				logger.Logger.Error().Msg(err.Error())
+				continue
 			}
 			allFiles = append(allFiles, doc)
+		}
+		if len(allFiles) == 0 {
+			return edinet.DocumentFile{}, fmt.Errorf("document not found")
 		}
 		content, err := createZip(allFiles)
 		if err != nil {
@@ -39,7 +46,7 @@ func (d *Document) FindContent(id edinet.DocumentId, fileType edinet.FileType) (
 		response := edinet.DocumentFile{
 			Name:       fmt.Sprintf("ALL_%s", id.String()),
 			Extension:  ".zip",
-			DocumentId: id,
+			DocumentId: id.String(),
 			Content:    content,
 		}
 

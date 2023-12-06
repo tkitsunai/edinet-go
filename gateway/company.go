@@ -63,13 +63,22 @@ func (c *Company) Store(company core.Company) error {
 
 func (c *Company) StoreAll(companies core.Companies) error {
 	storeData := make(map[string]interface{})
-
 	for _, company := range companies {
 		if company.EdinetCode.String() == "" {
 			continue
 		}
-		storeData[company.EdinetCode.String()] = company
+		foundCompany, err := c.FindById(company.EdinetCode)
+		// not found
+		if err != nil {
+			storeData[company.EdinetCode.String()] = company
+			continue
+		}
+		// found
+		for k, v := range company.Docs {
+			foundCompany.Docs[k] = v
+		}
+		foundCompany.Name = company.Name
+		storeData[company.EdinetCode.String()] = foundCompany
 	}
-
 	return c.db.Batch(datastore.CompanyTable, storeData)
 }

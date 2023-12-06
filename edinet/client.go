@@ -48,12 +48,12 @@ func (c *Client) URL() *url.URL {
 	return &baseUrl
 }
 
-func (c *Client) RequestDocumentList(date core.Date) (EdinetDocumentResponse, error) {
+func (c *Client) RequestDocuments(date core.Date, requestType RequestType) (EdinetDocumentResponse, error) {
 	u := c.URL()
 	u.Path = path.Join(u.Path, "documents.json")
 	q := u.Query()
 	q.Set("date", date.String())
-	q.Set("type", MetaDataAndDocuments.String())
+	q.Set("type", requestType.String())
 	q.Set(SubscriptionKey, c.apiKey)
 	u.RawQuery = q.Encode()
 
@@ -70,7 +70,7 @@ func (c *Client) RequestDocumentList(date core.Date) (EdinetDocumentResponse, er
 	return res, nil
 }
 
-func (c *Client) RequestDocument(docId DocumentId, fileType FileType) (DocumentFile, error) {
+func (c *Client) RequestDocument(docId core.DocumentId, fileType FileType) (DocumentFile, error) {
 	u := c.URL()
 	u.Path = path.Join(u.Path, "documents", docId.String())
 	q := u.Query()
@@ -95,7 +95,7 @@ func (c *Client) RequestDocument(docId DocumentId, fileType FileType) (DocumentF
 		case "application/pdf":
 			extension = ".pdf"
 		case "application/json; charset=utf-8":
-			return DocumentFile{}, fmt.Errorf("document not found: %s", docId.String())
+			return DocumentFile{}, fmt.Errorf("document not found: ID:%s, type:%s", docId.String(), fileType.String())
 		}
 		// read binary
 		defer response.Body.Close()
@@ -105,13 +105,13 @@ func (c *Client) RequestDocument(docId DocumentId, fileType FileType) (DocumentF
 		}
 
 		res := DocumentFile{
-			Name:       docId.String(),
+			Name:       fmt.Sprintf("%s_%s", docId.String(), fileType.String()),
 			Extension:  extension,
-			DocumentId: docId,
+			DocumentId: docId.String(),
 			Content:    content,
 		}
 		return res, nil
 	}
 
-	return DocumentFile{}, nil
+	return DocumentFile{}, fmt.Errorf("error document download")
 }

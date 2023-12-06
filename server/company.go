@@ -14,8 +14,9 @@ type Company struct {
 }
 
 func NewCompany(i *do.Injector) (*Company, error) {
-	companyUsecase := do.MustInvoke[*usecase.Company](i)
-	return &Company{companyUsecase: companyUsecase}, nil
+	return &Company{
+		companyUsecase: do.MustInvoke[*usecase.Company](i),
+	}, nil
 }
 
 func (c *Company) FindCompany(ctx *fiber.Ctx) error {

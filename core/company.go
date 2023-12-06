@@ -29,3 +29,7 @@ func (e EdinetCode) String() string {
 func (d DocumentId) String() string {
 	return string(d)
 }
+
+func (d DocumentId) Valid() bool {
+	return len(string(d)) > 0
+}

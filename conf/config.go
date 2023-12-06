@@ -85,6 +85,7 @@ func readServerConfig() {
 
 type ServerConfig struct {
 	Port       string     `yaml:"port"`
+	Mode       string     `yaml:"mode"`
 	Persistent Persistent `yaml:"persistent"`
 }
 

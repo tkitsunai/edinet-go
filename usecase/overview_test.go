@@ -21,6 +21,10 @@ type MockPort struct {
 	mock.Mock
 }
 
+func (m *MockPort) GetRaw(date core.Date, requestType edinet.RequestType) (edinet.EdinetDocumentResponse, error) {
+	panic("implement me")
+}
+
 func (m *MockPort) Get(date core.Date) (edinet.EdinetDocumentResponse, error) {
 	called := m.Called(date)
 	response := called.Get(0).(edinet.EdinetDocumentResponse)

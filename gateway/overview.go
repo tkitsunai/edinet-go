@@ -23,6 +23,10 @@ func NewOverview(i *do.Injector) (port.Overview, error) {
 	}, nil
 }
 
+func (o *Overview) GetRaw(date core.Date, requestType edinet.RequestType) (edinet.EdinetDocumentResponse, error) {
+	return o.c.RequestDocuments(date, requestType)
+}
+
 func (o *Overview) GetByStore(date core.Date) (edinet.EdinetDocumentResponse, error) {
 	// メタデータの取得
 	findMetaData, err := o.db.FindByKey(datastore.MetaDataTable, date.String())
@@ -55,7 +59,7 @@ func (o *Overview) GetByStore(date core.Date) (edinet.EdinetDocumentResponse, er
 
 func (o *Overview) Get(date core.Date) (edinet.EdinetDocumentResponse, error) {
 	// data persistent from edinet-data
-	results, err := o.c.RequestDocumentList(date)
+	results, err := o.c.RequestDocuments(date, edinet.MetaDataAndDocuments)
 	if err != nil {
 		return edinet.EdinetDocumentResponse{}, err
 	}

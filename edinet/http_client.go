@@ -37,7 +37,7 @@ func (r *HttpClient) NewRequest(
 		requestBody = string(reqBody)
 		logger.Logger.Debug().Msgf("Request body:%s", requestBody)
 	}
-
+	logger.Logger.Debug().Msgf("URL:%s", u.String())
 	req, err := http.NewRequest(method, u.String(), strings.NewReader(requestBody))
 	if err != nil {
 		return nil, err

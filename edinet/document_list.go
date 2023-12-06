@@ -17,12 +17,6 @@ func (f FileType) String() string {
 	return fmt.Sprintf("%d", f)
 }
 
-type DocumentId string
-
-func (f DocumentId) String() string {
-	return string(f)
-}
-
 const (
 	MetaDataOnly RequestType = iota + 1
 	MetaDataAndDocuments
@@ -69,7 +63,7 @@ type DocumentListRequestParameter struct {
 type DocumentFile struct {
 	Name       string
 	Extension  string
-	DocumentId DocumentId
+	DocumentId string
 	Content    []byte
 }
 

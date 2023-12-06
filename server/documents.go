@@ -10,19 +10,16 @@ import (
 )
 
 type Documents struct {
-	overviewUsecase *usecase.Overview
-	documentUsecase *usecase.Document
+	overviewUC *usecase.Overview
+	documentUC *usecase.Document
 }
 
 func NewDocuments(
 	i *do.Injector,
 ) (*Documents, error) {
-	overview := do.MustInvoke[*usecase.Overview](i)
-	docUsecase := do.MustInvoke[*usecase.Document](i)
-
 	return &Documents{
-		overviewUsecase: overview,
-		documentUsecase: docUsecase,
+		overviewUC: do.MustInvoke[*usecase.Overview](i),
+		documentUC: do.MustInvoke[*usecase.Document](i),
 	}, nil
 }
 
@@ -35,7 +32,7 @@ func (d *Documents) StoreDocumentsByTerm(ctx *fiber.Ctx) error {
 
 	term := core.NewTerm(core.Date(p.From), core.Date(p.To))
 
-	err = d.overviewUsecase.StoreByTerm(term)
+	err = d.overviewUC.StoreByTerm(term)
 	if err != nil {
 		return err
 	}
@@ -54,7 +51,7 @@ func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
 
 	term := core.NewTerm(core.Date(p.From), core.Date(p.To))
 
-	overviews, err := d.overviewUsecase.FindOverviewByTerm(term, p.Refresh)
+	overviews, err := d.overviewUC.FindOverviewByTerm(term, p.Refresh)
 
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
@@ -75,19 +72,18 @@ func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
 
 func (d *Documents) GetDocument(ctx *fiber.Ctx) error {
 	did := ctx.Params("id")
-	documentId := edinet.DocumentId(did)
-
+	documentId := core.DocumentId(did)
 	query := ctx.Query("type")
 	fileType := edinet.NewFileTypeByName(query)
 
-	if fileType == edinet.Unknown {
+	if ok := documentId.Valid(); !ok || fileType == edinet.Unknown {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"status":  http.StatusBadRequest,
 			"message": "request parameter invalid. parameter name 'type' is required",
 		})
 	}
 
-	document, err := d.documentUsecase.FindContent(documentId, fileType)
+	document, err := d.documentUC.FindContent(documentId, fileType)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"status":  http.StatusInternalServerError,
@@ -97,10 +93,6 @@ func (d *Documents) GetDocument(ctx *fiber.Ctx) error {
 
 	ctx.Set("Content-Disposition", "attachment; filename="+document.NameWithExtension())
 	return ctx.Send(document.Content)
-}
-
-type FileDateParam struct {
-	Date string
 }
 
 type TermParams struct {

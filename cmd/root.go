@@ -35,7 +35,9 @@ var rootCmd = &cobra.Command{
 
 		injector := di.SetUpContainer(storage.GetDriver())
 
-		s := server.NewServer(storage, injector)
+		s := server.NewServer(injector, server.Config{
+			Mode: server.OfMode(conf.LoadServerConfig().Mode),
+		})
 
 		return s.Run()
 	},
