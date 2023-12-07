@@ -56,15 +56,15 @@ func NewServer(injector *do.Injector, cfg Config) *Server {
 
 func (s *Server) setHandlers() {
 	docResources := do.MustInvoke[*Documents](s.i)
-	companyResoures := do.MustInvoke[*Company](s.i)
+	companyResources := do.MustInvoke[*Company](s.i)
 	edinetResources := do.MustInvoke[*EdinetRaw](s.i)
 	s.app.Get("/_raw/api/v2/documents.json", edinetResources.GetMetaDataByDate)
 	s.app.Get("/_raw/api/v2/documents/:id", edinetResources.GetDocumentByType)
 	s.app.Get("/documents", docResources.GetDocumentsByTerm)
 	s.app.Post("/documents", docResources.StoreDocumentsByTerm)
 	s.app.Get("/documents/:id", docResources.GetDocument)
-	s.app.Get("/companies", companyResoures.FindCompanies)
-	s.app.Get("/companies/:id", companyResoures.FindCompany)
+	s.app.Get("/companies", companyResources.FindCompanies)
+	s.app.Get("/companies/:id", companyResources.FindCompany)
 
 	if s.cfg.Mode == DEVELOPMENT_MODE {
 		s.app.Use(pprof.New())
