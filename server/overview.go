@@ -1,7 +1,6 @@
 package server
 
 import (
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/samber/do"
 	"github.com/tkitsunai/edinet-go/core"
@@ -14,8 +13,6 @@ type Overview struct {
 	overviewUC *usecase.Overview
 	documentUC *usecase.Document
 }
-
-var validate = validator.New()
 
 func NewOverview(
 	i *do.Injector,
@@ -56,6 +53,26 @@ func (d *Overview) StoreByTerm(ctx *fiber.Ctx) error {
 func (d *Overview) FindByTerm(ctx *fiber.Ctx) error {
 	p := TermParams{}
 	err := ctx.QueryParser(&p)
+	if err != nil {
+		return err
+	}
+	term := core.NewTerm(core.Date(p.From), core.Date(p.To))
+
+	results, err := d.overviewUC.FindByTerm(term)
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"message": err,
+		})
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"items": results,
+	})
+}
+
+func (d *Overview) FindByTermRaw(ctx *fiber.Ctx) error {
+	p := TermParams{}
+	err := ctx.QueryParser(&p)
 
 	if err != nil {
 		return err
@@ -63,7 +80,7 @@ func (d *Overview) FindByTerm(ctx *fiber.Ctx) error {
 
 	term := core.NewTerm(core.Date(p.From), core.Date(p.To))
 
-	overviews, err := d.overviewUC.FindByTerm(term, p.Refresh)
+	overviews, err := d.overviewUC.FindRawByTerm(term, p.Refresh)
 
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
@@ -108,7 +125,6 @@ func (d *Overview) GetDocument(ctx *fiber.Ctx) error {
 }
 
 type TermParams struct {
-	//
 	From    string `query:"from" validate:"required"`
 	To      string `query:"to" validate:"required"`
 	Refresh bool   `query:"refresh"`

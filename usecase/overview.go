@@ -67,7 +67,41 @@ func (o *Overview) StoreByTerm(term core.Term) error {
 	return nil
 }
 
-func (o *Overview) FindByTerm(term core.Term, refresh bool) ([]edinet.EdinetDocumentResponse, error) {
+func (o *Overview) FindByTerm(term core.Term) ([]edinet.Result, error) {
+	dateRange := term.GetDateRange()
+
+	var mu = sync.Mutex{}
+	var meg = multierror.Group{}
+	var wg sync.WaitGroup
+
+	var results []edinet.Result
+	for i, date := range dateRange {
+		wg.Add(1)
+		go func(idx int, date core.Date) {
+			mu.Lock()
+			defer mu.Unlock()
+			defer wg.Done()
+			meg.Go(func() error {
+				storedDocumentResults, err := o.ovPort.GetByStore(date)
+				if err != nil {
+					return err
+				}
+				results = append(results, storedDocumentResults.Results...)
+				return nil
+			})
+		}(i, date)
+	}
+	wg.Wait()
+	megErr := meg.Wait()
+
+	if err := megErr.ErrorOrNil(); err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
+func (o *Overview) FindRawByTerm(term core.Term, refresh bool) ([]edinet.EdinetDocumentResponse, error) {
 	dateRange := term.GetDateRange()
 	var mu = sync.Mutex{}
 	var meg multierror.Group

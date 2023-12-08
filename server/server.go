@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/samber/do"
@@ -22,6 +23,8 @@ const (
 	DEVELOPMENT_MODE = ServerMode("DEV")
 	PRODUCTION_MODE  = ServerMode("PRODUCION")
 )
+
+var validate = validator.New()
 
 func OfMode(mode string) ServerMode {
 	switch strings.ToUpper(mode) {
@@ -62,9 +65,11 @@ func (s *Server) setHandlers() {
 	s.app.Get("/_raw/api/v2/documents/:id", edinetResources.GetDocumentByType)
 
 	s.app.Post("/documents", docResources.StoreByTerm)
+	s.app.Get("/documents", docResources.FindByTermRaw)
+	s.app.Get("/v2/documents", docResources.FindByTerm)
 
-	s.app.Get("/documents", docResources.FindByTerm)
 	s.app.Get("/documents/:id", docResources.GetDocument)
+
 	s.app.Get("/companies", companyResources.FindCompanies)
 	s.app.Get("/companies/:id", companyResources.FindCompany)
 
