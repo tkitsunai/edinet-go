@@ -51,18 +51,18 @@ func (b *BoltDB) GetDriver() Driver {
 
 func (b *BoltDB) FindByKey(bucketKey, key string) ([]byte, error) {
 	if len(key) == 0 {
-		return nil, nil
+		return nil, RequiredKey
 	}
 	var result []byte
 	err := b.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketKey))
 		if bucket == nil {
-			return fmt.Errorf("bucket not found")
+			return BucketNotFound
 		}
 
 		keyData := bucket.Get([]byte(key))
 		if keyData == nil {
-			return fmt.Errorf(fmt.Sprintf("data not found key: %s", key))
+			return RecordNotFound
 		}
 		result = keyData
 		return nil
@@ -80,7 +80,7 @@ func (b *BoltDB) FindAll(bucketKey string) ([][]byte, error) {
 	err := b.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketKey))
 		if bucket == nil {
-			return fmt.Errorf("bucket not found")
+			return BucketNotFound
 		}
 
 		err := bucket.ForEach(func(k, v []byte) error {

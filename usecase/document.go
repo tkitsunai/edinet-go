@@ -16,13 +16,16 @@ type Document struct {
 }
 
 func NewDocument(i *do.Injector) (*Document, error) {
-	docPort := do.MustInvoke[port.Document](i)
 	return &Document{
-		docPort: docPort,
+		docPort: do.MustInvoke[port.Document](i),
 	}, nil
 }
 
-func (d *Document) FindContent(id core.DocumentId, fileType edinet.FileType) (edinet.DocumentFile, error) {
+func (d *Document) Store(id core.DocumentId, fileType edinet.FileType) error {
+	return nil
+}
+
+func (d *Document) Download(id core.DocumentId, fileType edinet.FileType) (edinet.DocumentFile, error) {
 	// 全ファイルを取得
 	if fileType == edinet.ALL {
 		var allFiles []edinet.DocumentFile

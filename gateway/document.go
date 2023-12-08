@@ -12,8 +12,7 @@ type Document struct {
 }
 
 func NewDocument(i *do.Injector) (port.Document, error) {
-	client := do.MustInvoke[*edinet.Client](i)
-	return &Document{c: client}, nil
+	return &Document{c: do.MustInvoke[*edinet.Client](i)}, nil
 }
 
 func (d *Document) Get(id core.DocumentId, fileType edinet.FileType) (edinet.DocumentFile, error) {

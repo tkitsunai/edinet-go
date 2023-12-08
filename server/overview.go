@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/samber/do"
 	"github.com/tkitsunai/edinet-go/core"
@@ -9,25 +10,36 @@ import (
 	"net/http"
 )
 
-type Documents struct {
+type Overview struct {
 	overviewUC *usecase.Overview
 	documentUC *usecase.Document
 }
 
-func NewDocuments(
+var validate = validator.New()
+
+func NewOverview(
 	i *do.Injector,
-) (*Documents, error) {
-	return &Documents{
+) (*Overview, error) {
+	return &Overview{
 		overviewUC: do.MustInvoke[*usecase.Overview](i),
 		documentUC: do.MustInvoke[*usecase.Document](i),
 	}, nil
 }
 
-func (d *Documents) StoreDocumentsByTerm(ctx *fiber.Ctx) error {
+func (d *Overview) StoreByTerm(ctx *fiber.Ctx) error {
 	p := TermParams{}
-	err := ctx.QueryParser(&p)
+	err := ctx.BodyParser(&p)
 	if err != nil {
-		return err
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"message": err,
+		})
+	}
+
+	err = validate.Struct(p)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"message": err,
+		})
 	}
 
 	term := core.NewTerm(core.Date(p.From), core.Date(p.To))
@@ -41,7 +53,7 @@ func (d *Documents) StoreDocumentsByTerm(ctx *fiber.Ctx) error {
 	})
 }
 
-func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
+func (d *Overview) FindByTerm(ctx *fiber.Ctx) error {
 	p := TermParams{}
 	err := ctx.QueryParser(&p)
 
@@ -51,7 +63,7 @@ func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
 
 	term := core.NewTerm(core.Date(p.From), core.Date(p.To))
 
-	overviews, err := d.overviewUC.FindOverviewByTerm(term, p.Refresh)
+	overviews, err := d.overviewUC.FindByTerm(term, p.Refresh)
 
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
@@ -70,7 +82,7 @@ func (d *Documents) GetDocumentsByTerm(ctx *fiber.Ctx) error {
 	})
 }
 
-func (d *Documents) GetDocument(ctx *fiber.Ctx) error {
+func (d *Overview) GetDocument(ctx *fiber.Ctx) error {
 	did := ctx.Params("id")
 	documentId := core.DocumentId(did)
 	query := ctx.Query("type")
@@ -83,7 +95,7 @@ func (d *Documents) GetDocument(ctx *fiber.Ctx) error {
 		})
 	}
 
-	document, err := d.documentUC.FindContent(documentId, fileType)
+	document, err := d.documentUC.Download(documentId, fileType)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"status":  http.StatusInternalServerError,
@@ -96,7 +108,8 @@ func (d *Documents) GetDocument(ctx *fiber.Ctx) error {
 }
 
 type TermParams struct {
-	From    string `query:"from"`
-	To      string `query:"to"`
+	//
+	From    string `query:"from" validate:"required"`
+	To      string `query:"to" validate:"required"`
 	Refresh bool   `query:"refresh"`
 }

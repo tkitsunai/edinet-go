@@ -60,7 +60,6 @@ func (r *HttpClient) ExecuteGetWithDecodeJson(
 		return http.StatusInternalServerError, err
 	}
 
-	logger.Logger.Debug().Msgf("URL:%s", u.String())
 	res, err := r.client.Do(req)
 	if err != nil {
 		return res.StatusCode, err

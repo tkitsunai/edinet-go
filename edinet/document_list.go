@@ -61,10 +61,11 @@ type DocumentListRequestParameter struct {
 }
 
 type DocumentFile struct {
-	Name       string
-	Extension  string
-	DocumentId string
-	Content    []byte
+	Name        string
+	Extension   string
+	DocumentId  string
+	ContentType string
+	Content     []byte
 }
 
 func (f *DocumentFile) NameWithExtension() string {

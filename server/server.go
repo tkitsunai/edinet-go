@@ -55,13 +55,15 @@ func NewServer(injector *do.Injector, cfg Config) *Server {
 }
 
 func (s *Server) setHandlers() {
-	docResources := do.MustInvoke[*Documents](s.i)
+	docResources := do.MustInvoke[*Overview](s.i)
 	companyResources := do.MustInvoke[*Company](s.i)
 	edinetResources := do.MustInvoke[*EdinetRaw](s.i)
 	s.app.Get("/_raw/api/v2/documents.json", edinetResources.GetMetaDataByDate)
 	s.app.Get("/_raw/api/v2/documents/:id", edinetResources.GetDocumentByType)
-	s.app.Get("/documents", docResources.GetDocumentsByTerm)
-	s.app.Post("/documents", docResources.StoreDocumentsByTerm)
+
+	s.app.Post("/documents", docResources.StoreByTerm)
+
+	s.app.Get("/documents", docResources.FindByTerm)
 	s.app.Get("/documents/:id", docResources.GetDocument)
 	s.app.Get("/companies", companyResources.FindCompanies)
 	s.app.Get("/companies/:id", companyResources.FindCompany)

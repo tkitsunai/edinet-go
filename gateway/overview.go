@@ -15,11 +15,9 @@ type Overview struct {
 }
 
 func NewOverview(i *do.Injector) (port.Overview, error) {
-	c := do.MustInvoke[*edinet.Client](i)
-	db := do.MustInvoke[datastore.Driver](i)
 	return &Overview{
-		c:  c,
-		db: db,
+		c:  do.MustInvoke[*edinet.Client](i),
+		db: do.MustInvoke[datastore.Driver](i),
 	}, nil
 }
 

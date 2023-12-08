@@ -82,7 +82,7 @@ func TestOverview_FindOverviewByTerm(t *testing.T) {
 
 	for testName, tt := range cases {
 		t.Run(testName, func(t *testing.T) {
-			result, err := target.FindOverviewByTerm(tt.Term, false)
+			result, err := target.FindByTerm(tt.Term, false)
 			assert.Nil(t, err)
 			assert.EqualValues(t, tt.Expects, result)
 		})

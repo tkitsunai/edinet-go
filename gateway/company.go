@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"errors"
 	"github.com/samber/do"
 	"github.com/tkitsunai/edinet-go/core"
 	"github.com/tkitsunai/edinet-go/datastore"
@@ -21,6 +22,9 @@ func NewCompany(i *do.Injector) (port.Company, error) {
 func (c *Company) FindById(id core.EdinetCode) (core.Company, error) {
 	foundData, err := c.db.FindByKey(datastore.CompanyTable, id.String())
 	if err != nil {
+		if errors.Is(err, datastore.RecordNotFound) || errors.Is(err, datastore.BucketNotFound) {
+			return core.Company{}, port.CompanyNotFound
+		}
 		return core.Company{}, err
 	}
 	return decode[core.Company](foundData)
@@ -34,9 +38,9 @@ func (c *Company) Find() (core.Companies, error) {
 
 	res := make(core.Companies, len(companies))
 	for i, company := range companies {
-		d, err := decode[core.Company](company)
-		if err != nil {
-			return nil, err
+		d, err2 := decode[core.Company](company)
+		if err2 != nil {
+			return nil, err2
 		}
 		res[i] = d
 	}

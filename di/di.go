@@ -33,9 +33,10 @@ func SetUpContainer(storeDriver datastore.Driver) *do.Injector {
 	do.Provide(injector, usecase.NewOverview)
 	do.Provide(injector, usecase.NewDocument)
 	do.Provide(injector, usecase.NewCompany)
+	do.Provide(injector, usecase.NewPassThrough)
 
 	// handler resources
-	do.Provide(injector, server.NewDocuments)
+	do.Provide(injector, server.NewOverview)
 	do.Provide(injector, server.NewCompany)
 	do.Provide(injector, server.NewEdinetRaw)
 	do.Provide(injector, server.NewAdminResources)

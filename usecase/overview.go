@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"fmt"
 	"github.com/hashicorp/go-multierror"
 	"github.com/samber/do"
 	"github.com/tkitsunai/edinet-go/core"
@@ -18,24 +17,11 @@ type Overview struct {
 }
 
 func NewOverview(i *do.Injector) (*Overview, error) {
-	ovPort := do.MustInvoke[port.Overview](i)
-	companyPort := do.MustInvoke[port.Company](i)
-	ccPort := do.MustInvoke[port.CompanyConverter](i)
-
 	return &Overview{
-		ovPort:      ovPort,
-		companyPort: companyPort,
-		ccPort:      ccPort,
+		ovPort:      do.MustInvoke[port.Overview](i),
+		companyPort: do.MustInvoke[port.Company](i),
+		ccPort:      do.MustInvoke[port.CompanyConverter](i),
 	}, nil
-}
-
-func (o *Overview) FindByDateAndType(date core.Date, typ edinet.RequestType) (edinet.EdinetDocumentResponse, error) {
-	switch typ {
-	case edinet.MetaDataAndDocuments, edinet.MetaDataOnly:
-		return o.ovPort.GetRaw(date, typ)
-	default:
-		return edinet.EdinetDocumentResponse{}, fmt.Errorf("request type not match")
-	}
 }
 
 func (o *Overview) StoreByTerm(term core.Term) error {
@@ -50,7 +36,6 @@ func (o *Overview) StoreByTerm(term core.Term) error {
 			defer wg.Done()
 			mutex.Lock()
 			defer mutex.Unlock()
-
 			gr, err := o.ovPort.Get(date)
 			responses = append(responses, gr)
 			if err != nil {
@@ -61,7 +46,7 @@ func (o *Overview) StoreByTerm(term core.Term) error {
 	}
 	wg.Wait()
 
-	// 複数の日付にまたがって存在する企業データ
+	// 複数の日付にまたがって存在する企業と書類情報
 	totalSize := 0
 	for _, resultsSet := range responses {
 		totalSize += len(resultsSet.Results)
@@ -82,7 +67,7 @@ func (o *Overview) StoreByTerm(term core.Term) error {
 	return nil
 }
 
-func (o *Overview) FindOverviewByTerm(term core.Term, refresh bool) ([]edinet.EdinetDocumentResponse, error) {
+func (o *Overview) FindByTerm(term core.Term, refresh bool) ([]edinet.EdinetDocumentResponse, error) {
 	dateRange := term.GetDateRange()
 	var mu = sync.Mutex{}
 	var meg multierror.Group

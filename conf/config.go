@@ -15,8 +15,10 @@ var (
 	once                sync.Once
 	defaultConfig       = Config{ApiKey: "none"}
 	defaultServerConfig = ServerConfig{
-		Port:       "3000",
-		Persistent: Persistent{},
+		Port: "3000",
+		Persistent: Persistent{
+			Engine: "bolt",
+		},
 	}
 )
 

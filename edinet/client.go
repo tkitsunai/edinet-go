@@ -31,7 +31,6 @@ var (
 
 func NewClient(i *do.Injector) (*Client, error) {
 	config := do.MustInvoke[*conf.Config](i)
-
 	u, err := url.Parse(Base + v2)
 	if err != nil {
 		panic("parse base url error")
@@ -105,13 +104,14 @@ func (c *Client) RequestDocument(docId core.DocumentId, fileType FileType) (Docu
 		}
 
 		res := DocumentFile{
-			Name:       fmt.Sprintf("%s_%s", docId.String(), fileType.String()),
-			Extension:  extension,
-			DocumentId: docId.String(),
-			Content:    content,
+			Name:        fmt.Sprintf("%s_%s", docId.String(), fileType.String()),
+			Extension:   extension,
+			DocumentId:  docId.String(),
+			ContentType: contentType,
+			Content:     content,
 		}
 		return res, nil
 	}
 
-	return DocumentFile{}, fmt.Errorf("error document download")
+	return DocumentFile{}, apiError
 }

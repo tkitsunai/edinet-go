@@ -11,8 +11,8 @@ import (
 )
 
 type EdinetRaw struct {
-	document *usecase.Document
-	overview *usecase.Overview
+	document    *usecase.Document
+	passThrough *usecase.PassThrough
 }
 
 func (r *EdinetRaw) GetMetaDataByDate(ctx *fiber.Ctx) error {
@@ -26,7 +26,7 @@ func (r *EdinetRaw) GetMetaDataByDate(ctx *fiber.Ctx) error {
 	}
 
 	requestType := edinet.RequestType(p.Type)
-	result, err := r.overview.FindByDateAndType(core.Date(p.Date), requestType)
+	result, err := r.passThrough.DocumentMetas(core.Date(p.Date), requestType)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
@@ -47,20 +47,22 @@ func (r *EdinetRaw) GetDocumentByType(ctx *fiber.Ctx) error {
 
 	query := ctx.Query("type")
 	fileType := edinet.NewFileTypeByName(query)
-	document, err := r.document.FindContent(id, fileType)
+	document, err := r.document.Download(id, fileType)
 	if err != nil {
 		ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
-	ctx.Set("Content-Disposition", "attachment; filename="+document.NameWithExtension())
+
+	ctx.Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", document.NameWithExtension()))
+	ctx.Set("Content-Type", document.ContentType)
 	return ctx.Status(http.StatusOK).Send(document.Content)
 }
 
 func NewEdinetRaw(i *do.Injector) (*EdinetRaw, error) {
 	return &EdinetRaw{
-		document: do.MustInvoke[*usecase.Document](i),
-		overview: do.MustInvoke[*usecase.Overview](i),
+		document:    do.MustInvoke[*usecase.Document](i),
+		passThrough: do.MustInvoke[*usecase.PassThrough](i),
 	}, nil
 }
 
