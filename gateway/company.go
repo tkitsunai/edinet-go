@@ -68,9 +68,6 @@ func (c *Company) Store(company core.Company) error {
 func (c *Company) StoreAll(companies core.Companies) error {
 	storeData := make(map[string]interface{})
 	for _, company := range companies {
-		if company.EdinetCode.String() == "" {
-			continue
-		}
 		foundCompany, err := c.FindById(company.EdinetCode)
 		// not found
 		if err != nil {

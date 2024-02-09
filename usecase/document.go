@@ -26,7 +26,6 @@ func (d *Document) Store(id core.DocumentId, fileType edinet.FileType) error {
 }
 
 func (d *Document) Download(id core.DocumentId, fileType edinet.FileType) (edinet.DocumentFile, error) {
-	// 全ファイルを取得
 	if fileType == edinet.ALL {
 		var allFiles []edinet.DocumentFile
 		fts := edinet.AllFileType()

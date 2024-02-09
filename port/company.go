@@ -13,5 +13,5 @@ type Company interface {
 }
 
 type CompanyConverter interface {
-	UniqueCompanies(results []edinet.Result) ([]core.Company, error)
+	UniqueCompanies(results []edinet.Result) (core.Companies, error)
 }

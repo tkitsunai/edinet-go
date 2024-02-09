@@ -10,7 +10,7 @@ import (
 type CompanyConverter struct {
 }
 
-func (c *CompanyConverter) UniqueCompanies(results []edinet.Result) ([]core.Company, error) {
+func (c *CompanyConverter) UniqueCompanies(results []edinet.Result) (core.Companies, error) {
 	// create unique company list
 	unique := make(map[string]core.Company)
 	for _, result := range results {

@@ -59,7 +59,7 @@ func (o *Overview) StoreByTerm(term core.Term) error {
 	if err != nil {
 		return err
 	}
-	err = o.companyPort.StoreAll(companies)
+	err = o.companyPort.StoreAll(companies.FilterUnknownEdinetCode())
 	if err != nil {
 		return err
 	}

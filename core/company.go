@@ -1,7 +1,6 @@
 package core
 
 type Companies []Company
-
 type CompanyName string
 type EdinetCode string
 
@@ -32,4 +31,18 @@ func (d DocumentId) String() string {
 
 func (d DocumentId) Valid() bool {
 	return len(string(d)) > 0
+}
+
+func (e EdinetCode) Valid() bool {
+	return len(string(e)) > 0
+}
+
+func (c Companies) FilterUnknownEdinetCode() Companies {
+	var res Companies
+	for _, company := range c {
+		if company.EdinetCode.Valid() {
+			res = append(res, company)
+		}
+	}
+	return res
 }
