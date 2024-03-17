@@ -5,7 +5,7 @@ go 1.22.0
 require (
 	github.com/boltdb/bolt v1.3.1
 	github.com/go-playground/validator/v10 v10.17.0
-	github.com/gofiber/fiber/v2 v2.52.0
+	github.com/gofiber/fiber/v2 v2.52.1
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/redis/go-redis/v9 v9.4.0
 	github.com/rs/zerolog v1.32.0
